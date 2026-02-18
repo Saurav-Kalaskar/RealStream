@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RealStream - User Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2f2",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#102222",
+                        "space-blue": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(16, 34, 34, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(13, 242, 242, 0.1);
+        }
+        .neon-glow {
+            text-shadow: 0 0 10px rgba(13, 242, 242, 0.5);
+        }
+        .light-beam {
+            background: linear-gradient(180deg, transparent 0%, rgba(13, 242, 242, 0.1) 50%, transparent 100%);
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-space-blue font-display text-white min-h-screen relative overflow-x-hidden">
+<!-- Decorative Vertical Light Beams -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="light-beam absolute left-1/4 top-0 w-1 h-full opacity-50"></div>
+<div class="light-beam absolute left-3/4 top-0 w-1 h-full opacity-30"></div>
+<div class="light-beam absolute left-1/2 top-0 w-px h-full opacity-20"></div>
+</div>
+<!-- Main Mobile Layout -->
+<div class="relative z-10 max-w-md mx-auto min-h-screen flex flex-col pb-24">
+<!-- Floating 3D Search Bar Container -->
+<header class="p-6 sticky top-0 z-20">
+<div class="glass-panel rounded-full p-1.5 flex items-center shadow-xl shadow-cyan-900/10">
+<span class="material-icons text-primary ml-3">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-primary/40 px-3" placeholder="Search streams, clips, creators..." type="text"/>
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-icons text-primary text-sm">tune</span>
+</div>
+</div>
+</header>
+<!-- Profile Content Scroll Area -->
+<main class="flex-1 px-4 space-y-6">
+<!-- Center Profile Glass Panel -->
+<section class="glass-panel rounded-xl p-8 text-center flex flex-col items-center">
+<div class="relative mb-6">
+<div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+<img alt="User Avatar" class="w-32 h-32 rounded-full border-4 border-primary relative z-10 object-cover" data-alt="Modern cyberpunk character portrait with neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOGY25WfQmQE1PtAMuTFOLANXlz6Ul2fWs2F2tKaeDnZ5ttnNY3CzuALTqvu6DestIBV-KBJL6BIYIm7girjFLfB8M0Rnv-1FXXT7OFsMud8-GRowYy_1vrYaSibRn-iWAPQkb7jTMie4obO3SPrqTQSHPp_BmcvTaHjBDLPY_C0czPpjCn8TwjzIlHBuesJhVUcxOEEAxRu9kyDZ7pkvjP3nISU_edlX1FNuPPk3Kw-t4NajX-h4TNrbL16BKqKA1x6_kSc-jMMs"/>
+</div>
+<h1 class="text-3xl font-extrabold tracking-tight mb-1">Zephyr_Node</h1>
+<p class="text-primary/70 text-sm mb-6 font-medium">Cyber-Architecture &amp; Visual Synths</p>
+<div class="flex justify-between w-full mb-8">
+<div class="text-center">
+<div class="text-xl font-bold text-primary neon-glow">2.4M</div>
+<div class="text-[10px] uppercase tracking-widest text-primary/50">Followers</div>
+</div>
+<div class="w-px h-8 bg-primary/10 self-center"></div>
+<div class="text-center">
+<div class="text-xl font-bold text-primary neon-glow">156K</div>
+<div class="text-[10px] uppercase tracking-widest text-primary/50">Following</div>
+</div>
+<div class="w-px h-8 bg-primary/10 self-center"></div>
+<div class="text-center">
+<div class="text-xl font-bold text-primary neon-glow">12M</div>
+<div class="text-[10px] uppercase tracking-widest text-primary/50">Views</div>
+</div>
+</div>
+<button class="w-full bg-primary text-space-blue font-bold py-3 rounded-lg hover:shadow-[0_0_20px_rgba(13,242,242,0.4)] transition-all">
+                    EDIT PROFILE
+                </button>
+</section>
+<!-- Trending Horizontal Ribbon (Sidebar adaptation) -->
+<section>
+<div class="flex items-center justify-between mb-3 px-1">
+<h2 class="text-sm font-extrabold uppercase tracking-widest text-primary/80">Trending Now</h2>
+<span class="text-xs text-primary/40">View All</span>
+</div>
+<div class="flex overflow-x-auto space-x-3 pb-2 scroll-smooth">
+<div class="glass-panel px-4 py-2 rounded-full whitespace-nowrap text-xs font-semibold border-primary/20">#NeonCity</div>
+<div class="glass-panel px-4 py-2 rounded-full whitespace-nowrap text-xs font-semibold border-primary/20">#SynthWave</div>
+<div class="glass-panel px-4 py-2 rounded-full whitespace-nowrap text-xs font-semibold border-primary/20">#DeepSpace</div>
+<div class="glass-panel px-4 py-2 rounded-full whitespace-nowrap text-xs font-semibold border-primary/20">#HyperFlux</div>
+</div>
+</section>
+<!-- Suggested Creators (Right Sidebar adaptation) -->
+<section>
+<div class="flex items-center justify-between mb-3 px-1">
+<h2 class="text-sm font-extrabold uppercase tracking-widest text-primary/80">Top Synchronizers</h2>
+<span class="material-icons text-primary/40 text-sm">refresh</span>
+</div>
+<div class="flex overflow-x-auto space-x-4 pb-2">
+<div class="flex-shrink-0 flex flex-col items-center gap-2">
+<img class="w-14 h-14 rounded-full border border-primary/30 p-0.5" data-alt="Digital creator avatar in low light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLh7LK2sxTZKzRlKlFDvNt37wsSIcxqNdIMB3CBvHOofo9d9-QurMBR9xDnkhs4bOYwlge8TjjaK5oWcscgo_0aBIyKE7Eqv01S0nbFuRQuCo0yuRhL8J040mBq_ug7z8nxYZZEjjZiMjVesqAzQCDoxpNAP6gWBqohNksOqqR_F_ZDp-S--mCZG_y8iq2cIzsdHt2p2VI0UOARcF1YAb0swBp0T-w4sERN9UrdXwi2SsDhftQ_KwII40I4rAKlhr0fYQDF0xCfHY"/>
+<span class="text-[10px] font-bold">Flux_01</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2">
+<img class="w-14 h-14 rounded-full border border-primary/30 p-0.5" data-alt="Woman in futuristic lighting avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9St_GwDjUzMdtmRdwXbUrKpY873nN76L-xb-oPfCMXVOhGY4epjvrHhfQjpcFNB0vo_T9jhsbIowDgm7eIde9U9zVfv9IZFZImbN7cHpffDsRBSx_MOSskYK06eshjba6SO1rzjfZ2kZMlOAhxyMtd_EDw-7rSQhlQnrsPydWwewazQZHjv6h4rLWD5T7OWVRS8gzcs48U5QEQENNLwAxD9SfACbTl3STJggFiRCLFYJKQtYaD_S6xLtFzu9_sBR9BudyDrnlMos"/>
+<span class="text-[10px] font-bold">Neural_S</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2">
+<img class="w-14 h-14 rounded-full border border-primary/30 p-0.5" data-alt="Man with VR goggles portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfdDCOo9uBGVhY5mzCAVMMlIAy4h4-vPiH2QhThwU-1Pabyx4z3Ir6SisCipT-nTxNQ-qrJxUe-RypSCw8oltpdDtbUHhk8347VlmmLeI_YiLGYiZCVU-myj_BtgUHfMsYkDP9OTABUUNGlZH9uR-_fKeijmQa_ecJ1liS2kq_mBvog-Sty4BDf903lfeTFKpDGgGoPKn2bVSTAq_0MqY-D12yuq5rb4LItppRidENKVjWvLRzxob8xVQXzzQN9sM_y_cDduGqf2s"/>
+<span class="text-[10px] font-bold">Void.Walker</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2">
+<img class="w-14 h-14 rounded-full border border-primary/30 p-0.5" data-alt="Digital artist profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZmYqehD9HNEX7GHQLQV2BsYp1S9qc3Sz2ysoAV11q8p_itqGo_hxXqU24ikBSp95YD2JJc2LZP2UYKyk9Rtu3UqWoKdGrJ77M7-gvgdoLyEmkOqC52d3NtXzdDEkhTUfvlotihuTQp1zC1Z1vLZWt_oGBJOHmItxl-Uqei53ejDwj7UTJLg7qdspvmPL8llqqC5cIYErjqrNiDhvXWriTJbsFD_WJQO3BEO1eDqfmg6UX7wG1ywqYhww8ao0Nv0_AiP8brPjmnLo"/>
+<span class="text-[10px] font-bold">Aura.X</span>
+</div>
+</div>
+</section>
+<!-- Uploaded Videos Feed -->
+<section class="space-y-4">
+<h2 class="text-sm font-extrabold uppercase tracking-widest text-primary/80 px-1 mb-4">Transmission History</h2>
+<!-- Video Card 1 -->
+<div class="glass-panel rounded-xl overflow-hidden group">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="Vibrant abstract neon data streams" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWwDPmYKBAcmedqJ2rZPod5eabcri2pMms9FYJVTY7_rwShSodPxp-qSq7pj2ebwxxVXpLF4eQhETRzrBtWG7KrsvYVQJKUAmCpYPL5c9OlicV48CWGiNuvYWRiDhB1G8FPtcAF8BanG177cHphEgYXYy7T9tCEfKLNIqKsnJGWMHpAu6WQqsHiQBQhm15rfDJNJEYBjcQbTn9YvlX3mIQv4pwUbd81FGNDx-U343Dg8-SXAAA9kGWC94BXRfpknrrVRTYpYPfqzw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-space-blue/80 to-transparent"></div>
+<div class="absolute bottom-3 right-3 bg-space-blue/90 px-2 py-1 rounded text-[10px] font-bold text-primary">12:44</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-icons text-5xl text-primary">play_circle_filled</span>
+</div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-base mb-1">Architecting the Metaverse: Episode 04</h3>
+<div class="flex items-center text-[11px] text-white/50 space-x-3">
+<span>1.2M Views</span>
+<span>•</span>
+<span>2 days ago</span>
+</div>
+</div>
+</div>
+<!-- Video Card 2 -->
+<div class="glass-panel rounded-xl overflow-hidden group">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="Satellite view of digital Earth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMgpvZ2fX4rlYB_aBjtWIj6ruihHktBTKtblDfDekrRxNF6AZ8B-oYEhdvyOfrK1ReHKY_lxTEDqh-gMBOUrWvS5CWwo0POAlQPuNiTdA7-63GIe2j3h4tx_orQVgf3Rs9A2CxhcsiidZvT5ZUXJfMvWQtMwlLK-P2Af8BujhHNZz6rUUChv_8Tmkvs_1U-LKZRL585BCalUJ-zdgHqXPm_4S6Zpj8DY35-Czriet96LJnvUzxt9dlNVrxm99BWn9m7_fRXcRXF3M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-space-blue/80 to-transparent"></div>
+<div class="absolute bottom-3 right-3 bg-space-blue/90 px-2 py-1 rounded text-[10px] font-bold text-primary">08:15</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-icons text-5xl text-primary">play_circle_filled</span>
+</div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-base mb-1">Data Synthesis in Deep Orbit</h3>
+<div class="flex items-center text-[11px] text-white/50 space-x-3">
+<span>856K Views</span>
+<span>•</span>
+<span>1 week ago</span>
+</div>
+</div>
+</div>
+<!-- Video Card 3 -->
+<div class="glass-panel rounded-xl overflow-hidden group">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="Retro gaming and neon lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBtzH6S5ZbotkDFoGAGaklXW8ABBSIkyqItfJlBb_y8_ZpSaKcSoK23l7vQ6_0jsddVzHFVl86QRecgfsst8k8gF2YyMmThGIKU7_yf47xWgwq0yhOb9OGucYRCnoCNyd0_FrxEZ3vWIwzeT7NxxKTWuSWmJsVUryRQShwx9sIpSUVyWox3JHK_37OZ2IQ46IZxKDkCRQu4j31t2qaP5yUoYYY32HamLeQ2XX3KcHXnaNu5f-Om7NiZHdCtl41EtL2XyLEyBUQQjk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-space-blue/80 to-transparent"></div>
+<div class="absolute bottom-3 right-3 bg-space-blue/90 px-2 py-1 rounded text-[10px] font-bold text-primary">45:02</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-icons text-5xl text-primary">play_circle_filled</span>
+</div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-base mb-1">Legacy Tech: The Last Servers</h3>
+<div class="flex items-center text-[11px] text-white/50 space-x-3">
+<span>2.4M Views</span>
+<span>•</span>
+<span>3 weeks ago</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-30 flex justify-center pb-6 px-4">
+<div class="glass-panel w-full max-w-sm rounded-full py-3 px-8 flex justify-between items-center shadow-2xl border-primary/20">
+<button class="text-primary hover:scale-110 transition-transform">
+<span class="material-icons">home</span>
+</button>
+<button class="text-white/40 hover:text-primary transition-colors">
+<span class="material-icons">explore</span>
+</button>
+<div class="relative -top-1 bg-primary p-3 rounded-full shadow-[0_0_15px_rgba(13,242,242,0.6)]">
+<span class="material-icons text-space-blue">add</span>
+</div>
+<button class="text-white/40 hover:text-primary transition-colors">
+<span class="material-icons">notifications</span>
+</button>
+<button class="text-primary flex items-center justify-center">
+<div class="w-6 h-6 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC55OEiW0A5gYLJUYddzH-Hvt9TdggdKHdET_SUjHoCTe98x58A0X2YI13LLBJOwFnlHLN6JGLyoqT9dRbgwCO-L5P-gO8gaVZAkW06u1RsPTeIrOtIMXPd_Vk5bXYWDnkx0v732PoSBd43330al7gmsMt5cn3zKz8HV6_9l_zWxmdB4hFVaVW98RjB4w_QnkUL7ZktbKPxPVI4GmwX36TnSAZdtGNnbBWeh57EEsq07VgpRmWh0hCoOw_rAOCKljpWzqVsM1r7wfY"/>
+</div>
+</button>
+</div>
+</nav>
+</div>
+</body></html>

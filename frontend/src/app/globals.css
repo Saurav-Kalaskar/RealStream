@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+  --font-inter: var(--font-inter);
+
+  --color-primary: #257bf4;
+  --color-background-light: #f5f7f8;
+  --color-background-dark: #101722;
+
+  --color-surface: #101722;
+  /* Mapping old surface to new dark bg for compatibility */
+  --color-neon-cyan: #257bf4;
+  /* Mapping neon to primary */
+  --color-neon-magenta: #FF0050;
+
+
+
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+
+    100% {
+      background-position: 200%;
+    }
+  }
+}
+
+:root {
+  --background: #101722;
+  --foreground: #FFFFFF;
+
+  --color-1: 0 100% 63%;
+  --color-2: 270 100% 63%;
+  --color-3: 210 100% 63%;
+  --color-4: 195 100% 63%;
+  --color-5: 90 100% 63%;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: var(--font-inter), sans-serif;
+}
+
+body {
+  background-color: var(--color-background-dark);
+  color: #FFFFFF;
+}
+
+/* Custom Design Components */
+.rainbow-glow {
+  background: conic-gradient(from 0deg,
+      #0df2f2,
+      #ff00ff,
+      #0000ff,
+      #0df2f2);
+  filter: blur(12px);
+  opacity: 0.8;
+}
+
+.glass-panel {
+  background: rgba(34, 50, 73, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #101722;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.three-d-shadow {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(37, 123, 244, 0.2);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Retro Grid Animation */
+@keyframes grid {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-grid {
+  animation: grid 15s linear infinite;
+}
+
+/* Hide Next.js Dev Tools & Vercel Toolbar */
+nextjs-portal,
+[data-nextjs-toast],
+.nextjs-static-indicator-toast-wrapper,
+.nextjs-toast-errors-parent,
+[data-nextjs-dialog-overlay],
+#vercel-toolbar,
+.vercel-toolbar,
+vercel-live-feedback {
+  display: none !important;
+}

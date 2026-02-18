@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Core Relational Database (Auth, Users, Comments)
+  postgres:
+    image: postgres:16-alpine
+    container_name: realstream-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: realstream
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - realstream-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d realstream"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Caching & Deduplication (Scraper, Interactions)
+  redis:
+    image: redis:7-alpine
+    container_name: realstream-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - realstream-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  realstream-net:
+    driver: bridge

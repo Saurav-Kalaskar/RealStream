@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RealStream - Deep Space Video</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#257bf4", // Tuned to Neon Cyan as requested
+                        "background-light": "#f5f5f8",
+                        "background-dark": "#101022",
+                        "space-blue": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nebula-glow {
+            background: radial-gradient(circle, rgba(37, 123, 244, 0.15) 0%, rgba(16, 23, 34, 0) 70%);
+        }
+        .video-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(16, 23, 34, 0.8) 0%, rgba(16, 23, 34, 0) 20%, rgba(16, 23, 34, 0) 70%, rgba(16, 23, 34, 0.9) 100%);
+        }
+        body {
+            overscroll-behavior-y: none;
+            background-color: #101722;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display text-white selection:bg-primary/30">
+<!-- Main Mobile Container -->
+<div class="relative h-screen w-full max-w-[430px] mx-auto overflow-hidden bg-space-blue shadow-2xl">
+<!-- Ambient Nebula Glows -->
+<div class="absolute top-[-10%] left-[-10%] w-[80%] h-[40%] nebula-glow pointer-events-none"></div>
+<div class="absolute bottom-[-5%] right-[-10%] w-[70%] h-[50%] nebula-glow pointer-events-none"></div>
+<!-- Background Video Placeholder -->
+<div class="absolute inset-0 z-0">
+<img alt="Full screen cinematic video of a deep space galaxy" class="w-full h-full object-cover" data-alt="Cinematic deep space nebula with glowing stars" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnfwpKgDrc76l36qUOzftgzvhSyGSIMLcPVmh87tOZcxMS_EAS3LO36wQmtydQYqPO8GoUeb2cEeohn1m21NLEMBjdxOjr2grwR5Lp_0DIaiKk__elgsud-stU_-YBp1ELpJm3K6W5OPkPG0FNacTn4L15nfaQODmLxyk8NfezyRtnWejXiFb9RKNRVn63yxb7a42cN5G5C2IzkQiAJJRKHu3Ri3IiQj2F23k2demKA68aXULMz6h8Q6E1QujSNFPfkeygcFOIXNY"/>
+<div class="absolute inset-0 video-gradient-overlay"></div>
+</div>
+<!-- Persistent Glassmorphic Header -->
+<header class="absolute top-0 left-0 right-0 z-50 px-6 pt-12 pb-6 glass border-t-0 border-x-0 rounded-none">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-white text-lg">stream</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-primary">RealStream</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5">
+<span class="material-icons text-xl">search</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary/50 overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="User profile portrait in deep space lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjM2gxKvvLza00V5ctlDQ-ff2IaNh7x8qNyAETfZgmn2rjcQrEaR_GyqkTmTnJyxtC9AB-cCTOpbrKGd8h8elpI07jhSfZAh5A5hVvCjHItETg7iSY2Jw_3hVCyJcw1CMQnT6uAJ9-XHRJRwf78BD5T1mTZDT6MvykWG-jC3PbWEuHWlUsBs5JpceQkeZCm6jVwg70FoUzV2uC6Zi_bGORGHzIkgTky4jaIL8izlgxZD-KOtBwB-f2y6xSAyM2d1NgWts8NtuPoSI"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Right Side Action Stack -->
+<div class="absolute right-4 bottom-40 z-40 flex flex-col items-center gap-6">
+<div class="flex flex-col items-center gap-1">
+<button class="w-14 h-14 rounded-full glass flex items-center justify-center group">
+<span class="material-icons text-white group-active:text-red-500 group-active:scale-125 transition-all">favorite</span>
+</button>
+<span class="text-xs font-semibold drop-shadow-md">142k</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<button class="w-14 h-14 rounded-full glass flex items-center justify-center">
+<span class="material-icons text-white">chat_bubble</span>
+</button>
+<span class="text-xs font-semibold drop-shadow-md">8.4k</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<button class="w-14 h-14 rounded-full glass flex items-center justify-center">
+<span class="material-icons text-white">reply</span>
+</button>
+<span class="text-xs font-semibold drop-shadow-md">Share</span>
+</div>
+<div class="w-14 h-14 rounded-full glass p-1 flex items-center justify-center overflow-hidden border-2 border-primary animate-spin-slow">
+<img alt="Music record art" class="w-full h-full object-cover rounded-full" data-alt="Vibrant synthwave album cover spinning" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTEUNlZoxvDWDunzr9BIB5Fo2GbrLnaDW6gI13n-0oSFwsK1H_jRwq1BNKcB2699kjsAATfcCM9gA4kfyJ-cTOu5rEl5XKXecqSu-amKdnWUqnMLvPkNbB0voUoqtOFtL_Iwgn_Nyp6eHHBBqEby6C4XGhifdZDBdX-G2DGzqkxZu0mMKwkNM2A7eCsUr_n2PktlRvDbwCLuAAIFL_D1MAfoLQkCXQd1QZ0BelGc1-SoMnKa2h-ufdL0BRnUk_D5IG1hrb4YWO3jM"/>
+</div>
+</div>
+<!-- Bottom Info Panel -->
+<div class="absolute bottom-24 left-4 right-20 z-40">
+<div class="glass p-6 rounded-2xl">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="font-bold text-lg">@cosmic_voyager</span>
+<span class="material-icons text-primary text-sm">verified</span>
+</div>
+<button class="px-5 py-1.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary/80 transition-colors">
+                        Follow
+                    </button>
+</div>
+<h2 class="text-xl font-bold mb-2 leading-tight">Navigating the Pillars of Creation</h2>
+<p class="text-white/70 text-sm line-clamp-2">
+                    Journey deep into the Eagle Nebula. These towering columns of interstellar gas and dust are light years away. #SpaceExploration #Nebula #WebbTelescope
+                </p>
+<div class="mt-4 flex items-center gap-2 text-primary">
+<span class="material-icons text-sm">music_note</span>
+<span class="text-xs font-medium truncate">Original Audio - Starlight Symphonies</span>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 z-50 glass h-20 px-8 flex items-center justify-between rounded-none border-b-0 border-x-0">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons">home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-colors">
+<span class="material-icons">explore</span>
+</button>
+<button class="w-14 h-10 bg-white rounded-lg flex items-center justify-center -mt-2">
+<span class="material-icons text-space-blue font-bold">add</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-colors">
+<span class="material-icons">notifications</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-colors">
+<span class="material-icons">person</span>
+</button>
+</nav>
+<!-- Progress Bar -->
+<div class="absolute bottom-[80px] left-0 right-0 h-1 bg-white/10 z-50">
+<div class="h-full bg-primary w-1/3 shadow-[0_0_10px_#257bf4]"></div>
+</div>
+</div>
+</body></html>

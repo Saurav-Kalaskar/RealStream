@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RealStream - User Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#257bf4",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #101722;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .nebula-glow {
+            background: radial-gradient(circle at top right, rgba(37, 123, 244, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at bottom left, rgba(37, 123, 244, 0.1) 0%, transparent 40%);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(37, 123, 244, 0.4);
+        }
+        /* Custom scrollbar for mobile feel */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-100 font-display selection:bg-primary/30">
+<!-- Background Nebula Effect -->
+<div class="fixed inset-0 nebula-glow pointer-events-none"></div>
+<div class="relative min-h-screen max-w-md mx-auto overflow-hidden flex flex-col">
+<!-- Header Glass Section -->
+<header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 pt-12 pb-6">
+<div class="flex justify-between items-start">
+<div class="flex flex-col items-start gap-4">
+<div class="relative">
+<div class="w-20 h-20 rounded-full border-2 border-primary neon-border overflow-hidden bg-slate-800">
+<img class="w-full h-full object-cover" data-alt="Modern cyberpunk male profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWnS1Dt_zBUNA3MfrpUuFkPizTKwYCwL1dBpNua5tjJckkch6CNRYk0ErMT6LSQ3RQdxA4EW3uyx0xPhNk4w95KBJY-1Jbg4CxdolXtKeHuyLpZxA7Bil4PNLcMWY9nJhJuL_cOt5wyGxQX068GABsrWBjJM9Z8O_FDYNSukEtKA0PS6csG39h23aOPmOER57fCicFh9UFq2devxDADIPSD_yQGpzAtgkztYcFoGHi0ZL7MGyZ5WXle5v4kQDjWnGDbF-AWI8B4bU"/>
+</div>
+<div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-4 border-background-dark"></div>
+</div>
+<div>
+<h1 class="text-2xl font-extrabold tracking-tight text-white">Alex Thorne</h1>
+<p class="text-primary text-sm font-semibold">@alex_streamer</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-colors">
+<span class="material-icons text-xl">settings</span>
+</button>
+</div>
+</div>
+<!-- Profile Actions -->
+<div class="mt-6 flex gap-3">
+<button class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-xl transition-all active:scale-95 shadow-lg shadow-primary/20">
+                    Edit Profile
+                </button>
+<button class="w-12 flex items-center justify-center glass-panel rounded-xl hover:bg-white/10 transition-colors">
+<span class="material-icons">share</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-4 py-6 overflow-y-auto">
+<!-- Bio Section -->
+<div class="mb-6 px-2">
+<p class="text-slate-400 text-sm leading-relaxed">
+                    Digital nomad exploring the deep space of VR streaming. Creating immersive experiences for the next generation. 🚀
+                </p>
+</div>
+<!-- Stats Row -->
+<div class="grid grid-cols-3 gap-3 mb-8">
+<div class="glass-panel p-4 rounded-xl text-center">
+<span class="block text-xl font-extrabold text-white">12.8k</span>
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Followers</span>
+</div>
+<div class="glass-panel p-4 rounded-xl text-center">
+<span class="block text-xl font-extrabold text-white">245</span>
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Following</span>
+</div>
+<div class="glass-panel p-4 rounded-xl text-center">
+<span class="block text-xl font-extrabold text-white">1.2M</span>
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Views</span>
+</div>
+</div>
+<!-- Content Tabs -->
+<div class="flex gap-8 mb-6 border-b border-white/5 px-2">
+<button class="pb-4 border-b-2 border-primary text-sm font-bold text-white">Videos</button>
+<button class="pb-4 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-slate-300">Live</button>
+<button class="pb-4 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-slate-300">Collections</button>
+</div>
+<!-- Video Grid -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Video Item 1 -->
+<div class="group relative glass-panel p-1.5 rounded-[1.5rem] overflow-hidden">
+<div class="aspect-[9/12] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Abstract deep space nebula purple background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1VZu-ufYpLNt6ZCOj6i8-bZScF3JQSt2i3BTmCDhIb6xQsFPQSng53d3B_KbReGg_YXhSVQsktjxhymEjrJonaXv_oNIED7FCPYn983p1XGqNWVOUXNEokOKKY0djoSbyZPFvcOSvlBSlpgQm6tVcIDCRLpFzRMgu3k_IWlBR42zodEOhRoNX6FB6UvIO4ABRWPbIf4mPrDQpD7tTGHVSt5RFBtxeeDiCQAce2P7wKDDspX0-EyVeFrcdHCdMOmUzOslkzcZggbA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-1.5">
+<span class="material-icons text-sm text-white">play_arrow</span>
+<span class="text-xs font-bold text-white">24.5k</span>
+</div>
+</div>
+</div>
+<!-- Video Item 2 -->
+<div class="group relative glass-panel p-1.5 rounded-[1.5rem] overflow-hidden">
+<div class="aspect-[9/12] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Cinematic view of earth from orbit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALXF_r-aagrpopbVguat925RDeNHzpIjJqZ8NBlmmCAbayTA70QhOqxIhjQr9M4uoCVDznH7G7yeNMMltMCsizgVTqdDdB7a82HNmRp3gb-kX5tQw72z4PSDhvKsjUz2RmxTeBIYD6J9EqnIgP4TQHgvxHrKxRVbMKqlJZ6il5B2pN78OztGAUjW8vFOZDvKRyF4Mw3ECPVcWne7JFuBoAgs8gdEC3cPY48AZDfrwW10a3J6iPBOzI9cvzJQL4ILK3EAIeIUEvNRU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-1.5">
+<span class="material-icons text-sm text-white">play_arrow</span>
+<span class="text-xs font-bold text-white">12.1k</span>
+</div>
+</div>
+</div>
+<!-- Video Item 3 -->
+<div class="group relative glass-panel p-1.5 rounded-[1.5rem] overflow-hidden">
+<div class="aspect-[9/12] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Glowing neon tech architectural structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJZPLUwDEGMw1P9C21uUmzUb1Vvfws7LCTMyKX43BOoF1Ldt7nSwv2Z_ZFJATuwsihw3nu9csLwqmUe3ezfH6Kko70T_RU-iYQygfYoZCbODw-HBBntT4UKWOB8zJa-BES4jo42Uk1FgL6mskpj5gj43GEZEj1Dh41ad9AvC3QyaTcp8GzTp9tkqhEkVOM7Q-hFyV8fTjH28Fa9xBJciNZOlMZfQcmB6PU9-WEnoDeY_iI2QCsXrVQPqCV96QHVuQoB_7Tn1Dyucg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-1.5">
+<span class="material-icons text-sm text-white">play_arrow</span>
+<span class="text-xs font-bold text-white">8.9k</span>
+</div>
+</div>
+</div>
+<!-- Video Item 4 -->
+<div class="group relative glass-panel p-1.5 rounded-[1.5rem] overflow-hidden">
+<div class="aspect-[9/12] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Starry night sky over dark mountains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAptP2npGpsUzeNnDeC1Soljxa77yz1V6hHpvP_iJqd6R2EZv-dNaDx1sRUnYVm8OefS_Km0zxAABivzLdg568kO0gHB6bzWu_bvCOZ6TfQ5N0NPoO2INKZ3VY0Lm67Nnb-UaUt69xod07mFtqkeUnS2CteSALmLhdIRVYvFunI7TDcg4AOkMFXq-id9WSh_YBMIyHS1pWbGFTT10IAd2o68E5536O_8rWPCFZXSQP-PHdvBlpKaUJnt3yfpWoeCdiPWUz2UtpdZT0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-1.5">
+<span class="material-icons text-sm text-white">play_arrow</span>
+<span class="text-xs font-bold text-white">15.2k</span>
+</div>
+</div>
+</div>
+</div>
+<div class="h-20"></div> <!-- Spacer for Tab Bar -->
+</main>
+<!-- Bottom Tab Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-panel border-t border-white/10 px-8 py-4 flex justify-between items-center rounded-t-2xl">
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-icons text-2xl">home</span>
+</button>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-icons text-2xl">explore</span>
+</button>
+<button class="bg-primary p-2.5 rounded-xl shadow-lg shadow-primary/40 -translate-y-4">
+<span class="material-icons text-white text-2xl">add</span>
+</button>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-icons text-2xl">notifications</span>
+</button>
+<button class="text-primary transition-colors">
+<span class="material-icons text-2xl">person</span>
+</button>
+</nav>
+</div>
+</body></html>

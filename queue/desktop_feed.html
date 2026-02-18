@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RealStream - Deep Space Immersion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2f2",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101722", // Adjusted to user's deep space blue
+                        "glass": "rgba(34, 50, 73, 0.4)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #101722;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(34, 50, 73, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(13, 242, 242, 0.3);
+        }
+        .neon-text-glow {
+            text-shadow: 0 0 10px rgba(13, 242, 242, 0.5);
+        }
+        /* Decorative beams */
+        .light-beam {
+            position: fixed;
+            width: 2px;
+            height: 100vh;
+            background: linear-gradient(to bottom, transparent, #0df2f233, transparent);
+            z-index: -1;
+        }
+        /* 3D Shapes */
+        .shape-sphere {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #0df2f244, transparent);
+            filter: blur(40px);
+            z-index: -2;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display text-white bg-background-light dark:bg-background-dark min-h-screen">
+<!-- Decorative Background Elements -->
+<div class="light-beam left-1/4"></div>
+<div class="light-beam left-3/4"></div>
+<div class="shape-sphere w-96 h-96 -top-20 -left-20"></div>
+<div class="shape-sphere w-64 h-64 bottom-20 -right-10"></div>
+<div class="fixed inset-0 pointer-events-none opacity-20">
+<div class="absolute top-1/4 left-10 w-4 h-4 bg-primary rotate-45"></div>
+<div class="absolute bottom-1/3 right-20 w-8 h-8 border border-primary rounded-lg rotate-12"></div>
+</div>
+<!-- Glassmorphic Top Nav -->
+<nav class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 h-20 flex items-center px-8">
+<div class="flex items-center gap-2 mr-12">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-background-dark font-bold">play_arrow</span>
+</div>
+<span class="text-2xl font-extrabold tracking-tighter italic">REAL<span class="text-primary">STREAM</span></span>
+</div>
+<div class="flex-1 max-w-2xl relative">
+<input class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-6 text-xl font-semibold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-white/30" placeholder="Search the void..." type="text"/>
+<span class="material-icons absolute right-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+</div>
+<div class="flex items-center gap-6 ml-auto">
+<button class="flex items-center gap-2 hover:text-primary transition-colors">
+<span class="material-icons">explore</span>
+<span class="font-semibold">Discover</span>
+</button>
+<button class="flex items-center gap-2 text-primary">
+<span class="material-icons">sensors</span>
+<span class="font-semibold">Live</span>
+</button>
+<div class="h-10 w-10 rounded-full border-2 border-primary p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="User profile avatar close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0V5djK5kLoySb-uttGb7HVzgKzdIrAG3YcHd8wLuugbWoM8QJS_e4QA4h-4GqDvV3EygfkTep_gnUMNaPoFY5HayVl7btQ-cc6zjAb3ZYM2nsO5ZJ94xnCRgTCcfrQheevC6_du5CZjPnXQVxdQidHFweaz4BAjnZfFGJCbM8HCfW5Lwb15rTm47M-RR82Jj2SMhyOKT1IEUNlHe1BRkcnINOaGKOmKBocxM_MY-_1RqVCbG1VFefOZBOohElXMcc7_dw8Nfm95c"/>
+</div>
+</div>
+</nav>
+<!-- Main Content Grid -->
+<main class="pt-28 pb-10 px-8 flex justify-center gap-8 relative max-w-[1600px] mx-auto">
+<!-- Left Panel: Trending Tags -->
+<aside class="hidden xl:flex flex-col gap-6 w-72">
+<div class="glass-panel rounded-2xl p-6">
+<h3 class="text-xs uppercase tracking-widest text-primary font-extrabold mb-4 neon-text-glow">Trending Tags</h3>
+<div class="space-y-4">
+<a class="flex items-center justify-between group" href="#">
+<span class="text-white/70 group-hover:text-primary transition-colors">#CyberLife</span>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">2.4M</span>
+</a>
+<a class="flex items-center justify-between group" href="#">
+<span class="text-white/70 group-hover:text-primary transition-colors">#VoidVibes</span>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">1.8M</span>
+</a>
+<a class="flex items-center justify-between group" href="#">
+<span class="text-white/70 group-hover:text-primary transition-colors">#NeonDreams</span>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">940K</span>
+</a>
+<a class="flex items-center justify-between group" href="#">
+<span class="text-white/70 group-hover:text-primary transition-colors">#DeepSpace</span>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">512K</span>
+</a>
+</div>
+</div>
+<div class="glass-panel rounded-2xl p-6">
+<p class="text-white/40 text-xs leading-relaxed">
+                    Experience the future of streaming. Deep space immersion enabled. v4.0.2-alpha.
+                </p>
+</div>
+</aside>
+<!-- Center: Simulated Mobile Feed -->
+<section class="w-[400px] relative">
+<div class="glass-panel rounded-2xl overflow-hidden border-white/20 shadow-2xl relative aspect-[9/19]">
+<!-- iOS Status Bar Simulation -->
+<div class="absolute top-0 w-full h-10 flex items-center justify-between px-6 z-20">
+<span class="text-[13px] font-bold">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-icons text-[14px]">signal_cellular_alt</span>
+<span class="material-icons text-[14px]">wifi</span>
+<span class="material-icons text-[14px]">battery_full</span>
+</div>
+</div>
+<!-- Video Content -->
+<div class="relative w-full h-full bg-black">
+<img class="w-full h-full object-cover opacity-80" data-alt="Cyberpunk city street at night with neon signs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0xDzxJ0huKbal7wWa5XSb7xsDOlpMC8E7rgF8i-VPb6wIwric83jJwG8ZrzO5akTFrrBLtBCDdp5zb1G9jUSi6jspkLAV_fSb9UQTYyHJSA-Hx-1G30Klcf8o4AtFXIq-4X6YdGLyR-COAXJzzh6U9_YSI6Aox989vaddnpqkl7pIpkfcMHhJx6zXR7fEYYVWgsULZ5s0bxJALFqJ3j1fvh2-vKrND4KR945TQ1S-_rPAY52LNl1d1M2VZeoB_9SjVchKI_aDYyo"/>
+<!-- Vertical Interaction Overlay -->
+<div class="absolute right-4 bottom-32 flex flex-col gap-6 z-20">
+<div class="flex flex-col items-center gap-1">
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-white hover:text-primary transition-colors">
+<span class="material-icons">favorite</span>
+</button>
+<span class="text-[11px] font-bold">142K</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-white hover:text-primary transition-colors">
+<span class="material-icons">chat_bubble</span>
+</button>
+<span class="text-[11px] font-bold">1.2K</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-white hover:text-primary transition-colors">
+<span class="material-icons">share</span>
+</button>
+<span class="text-[11px] font-bold">452</span>
+</div>
+</div>
+<!-- Video Details Overlay -->
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent z-10">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full border border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Influencer profile portrait in neon lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWM-UidUgeP5l7evknQA9EtsrQLih1ndmAapMzmhnf-DUCXEIMP0e2HDgE8aqyFcBBjlR2Vnxz5uuRCAqmrynp7ZtvqioPCtclX-kFyE7f-mmlv5nDUb-hoa1BQRWcz4diboifcz4hWxXYTZQ4vm_5xd2xSZLZBtKQiY9kApJGUT9zMlrQJXrLv_RZg1SWrv3NpNDa-XHJah2DkvTZMOQztkdWPacm_2dN0EWzRSm0Xhs5K4NKztZfoSYjRH5Bt-Qp8AzCFyYG_bY"/>
+</div>
+<span class="font-bold text-sm tracking-tight">V0id_Runner</span>
+<span class="material-icons text-primary text-[14px]">verified</span>
+</div>
+<p class="text-sm leading-snug text-white/90 mb-2">Exploring the neon alleys of Sector 7. The vibes are absolutely immaculate tonight... <span class="text-primary font-bold">#NightCity</span></p>
+<div class="flex items-center gap-2">
+<span class="material-icons text-[14px] text-primary">music_note</span>
+<span class="text-xs text-white/70">Original Audio - Synthwave Echoes</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Indicator for Mobile Sim -->
+<div class="mt-6 flex justify-center">
+<button class="w-3 h-3 rounded-full bg-primary neon-glow"></button>
+<button class="w-3 h-3 rounded-full bg-white/20 ml-2"></button>
+<button class="w-3 h-3 rounded-full bg-white/20 ml-2"></button>
+</div>
+</section>
+<!-- Right Panel: Suggested Creators -->
+<aside class="hidden lg:flex flex-col gap-6 w-72">
+<div class="glass-panel rounded-2xl p-6">
+<h3 class="text-xs uppercase tracking-widest text-primary font-extrabold mb-4 neon-text-glow">Suggested Creators</h3>
+<div class="space-y-6">
+<!-- Creator 1 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a young creator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAup2a9Wlh0ZBQKnWjOGxSygNUMJ0rwfK-zY_v1ODqCmNWuVBB68KA_zbBVZD7sNJTUEUstrU8mGOOU5oHrYA7uqEeUOIbVnde1IvrL2ReYQJDsyf5lNIBLX5SxhTOnYKQU5rqnUREhEjrM1Ng-HdQZPFM9Z2W_-depIMGNOQ4LwRc8ooJFfVw16N3hkCTtov3ruACi7intvsIDB7foRrcGOXN9sBOwqEkVt96RRtfOMPV7AgxTVmjNl-CFl5aj_oKVaAvuDCBhDpQ"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Nova_Flux</span>
+<span class="text-[10px] text-white/50">204K Followers</span>
+</div>
+</div>
+<button class="bg-primary text-background-dark text-[10px] font-extrabold px-3 py-1.5 rounded-full hover:brightness-110 transition-all">FOLLOW</button>
+</div>
+<!-- Creator 2 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a digital artist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcEfuZTTpEEaJJfOygebtOJW728BSWk1TczmwqTrc1ErvgNms3qmuliCgAP66TGt-sO2yxPuMmijuANVfXRSmXamuU9wKTEL5Hnvmg50l6oUoqNGldEE_E71qrhjFcwF4xDpfvjKiTOR5x5m8ylAWki6-Q0VCm-Um6uEBg-teiCp1kguPBDOlVZlrfxc92gyL3o6C3c3AM5_UFQ0XuwwinS374msNpX6QIAapzO-e_ASw5qofkEMvGIpFOkn5NcjxzjSAq0Jt-2sQ"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Digital_Eve</span>
+<span class="text-[10px] text-white/50">1.2M Followers</span>
+</div>
+</div>
+<button class="bg-primary text-background-dark text-[10px] font-extrabold px-3 py-1.5 rounded-full hover:brightness-110 transition-all">FOLLOW</button>
+</div>
+<!-- Creator 3 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a male streamer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9KFM-YDRDyefDp5sK4sQKdZCOC7_ithBM6oRCptwPjkOABLUnnFDTSJUBFRRC4Bo3cL6nlxBMExOUoksmNyOwggJGho9_RM9H0WuubdRbzH4N52JbSn2xmpG8XI9LhrvNE0i8C14QaV2XgH9yn-5hU2dIVomzzULJZJ--iMHzgq8Lpn8XQYsAbX9Fz-teJqGwaVmT4bJNpVv2C0AQxxiJwuWUKI4p7_fIs1OaESnvWYhDWB2P81_ST8CI4s9rsXEqV3f3eUb3V0"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Pixel_Lord</span>
+<span class="text-[10px] text-white/50">89K Followers</span>
+</div>
+</div>
+<button class="bg-primary/20 text-primary border border-primary/30 text-[10px] font-extrabold px-3 py-1.5 rounded-full hover:bg-primary hover:text-background-dark transition-all">FOLLOW</button>
+</div>
+</div>
+<button class="w-full mt-6 text-xs font-bold text-primary/70 hover:text-primary transition-colors">See all creators</button>
+</div>
+<!-- Mini Map/World View -->
+<div class="glass-panel rounded-2xl p-4 overflow-hidden relative group">
+<div class="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors"></div>
+<div class="relative">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-icons text-primary text-sm">location_on</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Global Live Feed</span>
+</div>
+<div class="w-full h-32 bg-background-dark rounded-xl border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60" data-alt="Deep blue satellite image of earth at night" data-location="Global" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMfeWfHwRgPm55gfADY-uDQiWp1oAvvmH3qxqWHKkN65CSQtei63BXX7aZM-UWccryrLjYREfVLfyhwOjU07613hSt0FyCkkv04EBgw4MgfFafIxkPPV-NMuvWiBGcsAPxzXktR0p4Qxe1GVzjKdK-HQSOgG6eyDoXf_wIw97pYLgYWf0wAoZR_iGGUDdmKL6RyvJPhmp2YKZXeWfyXxyPVOgqXQi6lnH9XinGMsNk4o8skuMY7XFkqt9d7PCWNaTUEnFfi0t3DLU"/>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Floating UI Controls (Left Bottom) -->
+<div class="fixed bottom-10 left-10 flex flex-col gap-4">
+<button class="w-14 h-14 rounded-full glass-panel flex items-center justify-center text-primary border-primary/40 shadow-lg hover:scale-110 transition-transform">
+<span class="material-icons text-3xl">add</span>
+</button>
+<button class="w-14 h-14 rounded-full glass-panel flex items-center justify-center text-white/70 hover:text-primary transition-colors">
+<span class="material-icons text-2xl">notifications</span>
+</button>
+</div>
+</body></html>
