@@ -17,6 +17,11 @@
 9. [Docker Compose Deployment Model](#9-docker-compose-deployment-model)
 10. [Coding Standards & Low-Level Design Principles](#10-coding-standards--low-level-design-principles)
 11. [Component Interaction Map](#11-component-interaction-map)
+12. [How Video Streaming Works](#12-how-video-streaming-works)
+13. [Concurrency & Multithreading Model](#13-concurrency--multithreading-model)
+14. [Environment Variable Management & Security](#14-environment-variable-management--security)
+15. [Database Choice Rationale — PostgreSQL vs MongoDB](#15-database-choice-rationale--postgresql-vs-mongodb)
+16. [Production Database Access Guide](#16-production-database-access-guide)
 
 ---
 
@@ -106,15 +111,15 @@ graph TB
 
 | Class | Role |
 |---|---|
-| [SecurityConfig](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/config/SecurityConfig.java#28-109) | Central Spring Security filter chain — wires CORS, CSRF-off, session policy, OAuth2 login, JWT filter |
-| [CustomOAuth2UserService](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/CustomOAuth2UserService.java#16-63) | Extension of `DefaultOAuth2UserService`; upserts users from Google profile on first login |
-| [OAuth2AuthenticationSuccessHandler](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/OAuth2AuthenticationSuccessHandler.java#15-53) | After successful Google login, mints a JWT and redirects to frontend `/oauth2/redirect?token=...` |
-| [TokenProvider](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/TokenProvider.java#14-58) | Issues and validates HS256 JWTs using JJWT 0.11.5; expiry and secret from `AppProperties` |
-| [JwtAuthenticationFilter](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/JwtAuthenticationFilter.java#22-68) | `OncePerRequestFilter` — reads `Authorization: Bearer <token>`, validates, sets `SecurityContextHolder` |
-| `UserPrincipal` | [OAuth2User](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/CustomOAuth2UserService.java#33-45) adapter that bridges Spring Security principal with auth [User](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#6-12) entity |
-| [AuthController](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/controller/AuthController.java#14-39) | `GET /user/me` — returns `{id, email, name, pictureUrl}` for authenticated user |
+| `SecurityConfig` | Central Spring Security filter chain — wires CORS, CSRF-off, session policy, OAuth2 login, JWT filter |
+| `CustomOAuth2UserService` | Extension of `DefaultOAuth2UserService`; upserts users from Google profile on first login |
+| `OAuth2AuthenticationSuccessHandler` | After successful Google login, mints a JWT and redirects to frontend `/oauth2/redirect?token=...` |
+| `TokenProvider` | Issues and validates HS256 JWTs using JJWT 0.11.5; expiry and secret from `AppProperties` |
+| `JwtAuthenticationFilter` | `OncePerRequestFilter` — reads `Authorization: Bearer <token>`, validates, sets `SecurityContextHolder` |
+| `UserPrincipal` | `OAuth2User` adapter that bridges Spring Security principal with auth `User` entity |
+| `AuthController` | `GET /user/me` — returns `{id, email, name, pictureUrl}` for authenticated user |
 | `UserRepository` | `JpaRepository<User, UUID>` — `findByEmail`, `findById` |
-| [User](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#6-12) (model) | `id (UUID) · email · fullName · imageUrl · provider (GOOGLE) · role (USER)` |
+| `User` (model) | `id (UUID) · email · fullName · imageUrl · provider (GOOGLE) · role (USER)` |
 
 **Key dependencies (pom.xml):**
 - `spring-boot-starter-security`
@@ -132,12 +137,12 @@ graph TB
 
 | Class | Role |
 |---|---|
-| [UserProfileController](file:///Users/saurav/Desktop/Desktop/RealStream/backend/user-service/src/main/java/com/realstream/user/controller/UserProfileController.java#12-36) | `GET /me`, `PUT /me`, `GET /{userId}` — identity passed via `X-User-Id` header |
+| `UserProfileController` | `GET /me`, `PUT /me`, `GET /{userId}` — identity passed via `X-User-Id` header |
 | `UserProfileService` | Business logic: `getOrCreateProfile(UUID)`, `updateProfile(UUID, dto)` |
-| [UserProfile](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#159-163) (model) | Extended profile separate from auth [User](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#6-12) — bio, avatar, etc. |
+| `UserProfile` (model) | Extended profile separate from auth `User` — bio, avatar, etc. |
 | `UserProfileRepository` | JPA repo keyed on `userId (UUID)` |
 
-> **Design principle:** Auth identity ([User](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#6-12)) is owned by `auth-service`; extended profile ([UserProfile](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#159-163)) is owned by `user-service`. Services share only the `userId` UUID as a contract, never a foreign-key dependency across databases.
+> **Design principle:** Auth identity (`User`) is owned by `auth-service`; extended profile (`UserProfile`) is owned by `user-service`. Services share only the `userId` UUID as a contract, never a foreign-key dependency across databases.
 
 ---
 
@@ -148,8 +153,8 @@ graph TB
 
 | Class | Role |
 |---|---|
-| [VideoController](file:///Users/saurav/Desktop/Desktop/RealStream/backend/content-service/src/main/java/com/realstream/content/controller/VideoController.java#15-70) | `POST /videos` (upsert), `GET /videos` (paginated, filter by hashtag/channel), `GET /videos/{id}` |
-| [Video](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#15-27) (model) | `id · videoId (YouTube ID) · title · description · url · hashtags[] · thumbnailUrl · channelTitle · duration · viewCount` |
+| `VideoController` | `POST /videos` (upsert), `GET /videos` (paginated, filter by hashtag/channel), `GET /videos/{id}` |
+| `Video` (model) | `id · videoId (YouTube ID) · title · description · url · hashtags[] · thumbnailUrl · channelTitle · duration · viewCount` |
 | `VideoRepository` | `MongoRepository<Video, String>` — custom: `findByHashtagsIn`, `findByChannelTitle`, pageable |
 
 **Pagination Design:** Uses Spring Data's `Pageable` (page/size) returning a Spring `Page<Video>`. Frontend maps this to its own `Page<T>` interface.
@@ -201,12 +206,12 @@ public ResponseEntity<LikeStatus> toggleLike(UUID userId, String videoId) {
 ### 3.6 scraper-service (`:8000`)
 
 **Language:** Python 3 · **Framework:** FastAPI  
-**Files:** [main.py](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/main.py), [youtube_client.py](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py), [requirements.txt](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/requirements.txt)
+**Files:** `main.py`, `youtube_client.py`, `requirements.txt`
 
-**[YouTubeClient](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#6-133)** wraps `google-api-python-client`:
-- [search_videos(query, limit)](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#10-42) — biases toward Shorts by appending `"shorts"` to query + `videoDuration=short`
-- [get_channel_videos(channel_name, limit)](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#43-75) — resolves channel handle → channel ID first, then fetches latest short videos
-- [_map_video_data(item, source_query)](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#99-133) — normalizes YouTube API response to internal [Video](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#15-27) format
+**`YouTubeClient`** wraps `google-api-python-client`:
+- `search_videos(query, limit)` — biases toward Shorts by appending `"shorts"` to query + `videoDuration=short`
+- `get_channel_videos(channel_name, limit)` — resolves channel handle → channel ID first, then fetches latest short videos
+- `_map_video_data(item, source_query)` — normalizes YouTube API response to internal `Video` format
 
 **Scrape Pipeline:**
 ```
@@ -224,7 +229,7 @@ POST /scrape { hashtag?, channel?, limit }
 
 ### 4.1 Next.js Reverse Proxy (Dev + Docker Internal)
 
-[next.config.ts](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/next.config.ts) rewrites all `/api/*` paths to internal Docker hostnames. This is the **single source of truth** for frontend→backend routing:
+`next.config.ts` rewrites all `/api/*` paths to internal Docker hostnames. This is the **single source of truth** for frontend→backend routing:
 
 ```typescript
 // next.config.ts
@@ -242,7 +247,7 @@ rewrites() {
 
 > **Why this matters:** The frontend only ever calls `/api/*`. Whether running locally or in Docker, Next.js transparently proxies to the correct backend. No CORS issues, no hardcoded backend URLs in client code.
 
-### 4.2 Frontend API Client Binding ([lib/api.ts](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts))
+### 4.2 Frontend API Client Binding (`lib/api.ts`)
 
 All HTTP calls go through a single Axios instance:
 
@@ -315,7 +320,7 @@ sequenceDiagram
 
 ### Session Strategy
 
-`SessionCreationPolicy.ALWAYS` is set in [SecurityConfig](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/config/SecurityConfig.java#28-109). This keeps an HTTP session alive on the auth service **only during the OAuth2 handshake** (Google requires state param persistence). Once the JWT is issued, all subsequent requests are **stateless** — only the JWT matters.
+`SessionCreationPolicy.ALWAYS` is set in `SecurityConfig`. This keeps an HTTP session alive on the auth service **only during the OAuth2 handshake** (Google requires state param persistence). Once the JWT is issued, all subsequent requests are **stateless** — only the JWT matters.
 
 ### JWT Structure
 
@@ -438,7 +443,7 @@ frontend/src/
 
 ### 7.3 State Management Architecture
 
-**Provider tree (set up in [Providers.tsx](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/components/Providers.tsx)):**
+**Provider tree (set up in `Providers.tsx`):**
 ```
 <QueryClientProvider>          ← TanStack Query cache (staleTime: 60s)
   <AuthProvider>               ← Global auth state via React Context
@@ -452,14 +457,14 @@ frontend/src/
 | State Type | How Managed |
 |---|---|
 | Server / async (videos, comments, likes) | TanStack Query (`useInfiniteQuery`, `useMutation`) |
-| Global auth | React Context ([AuthContext](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#13-20)) |
+| Global auth | React Context (`AuthContext`) |
 | Session persistence (onboarded, topic, channel) | `sessionStorage` (survives page refresh within session) |
 | JWT token | `localStorage` |
 | UI state (modals, active index) | Local `useState` |
 
 ### 7.4 Design System
 
-**Tailwind v4 `@theme` (in [globals.css](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/app/globals.css)):**
+**Tailwind v4 `@theme` (in `globals.css`):**
 ```css
 @theme {
   --color-primary: #257bf4;           /* Brand blue */
@@ -478,7 +483,7 @@ frontend/src/
 - `.animate-grid` — 15s CSS translate animation for the retro grid background
 - `RetroGrid` component — animated SVG line grid creating a cyberpunk depth effect
 
-**Typography:** [Inter](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/JwtAuthenticationFilter.java#30-59) loaded via `next/font/google` (subsetting Latin, display: swap). `Material Symbols Outlined` loaded via `<link>` for icon variants.
+**Typography:** `Inter` loaded via `next/font/google` (subsetting Latin, display: swap). `Material Symbols Outlined` loaded via `<link>` for icon variants.
 
 ---
 
@@ -552,7 +557,7 @@ interaction-service schema:
 
 ## 9. Docker Compose Deployment Model
 
-**File:** [docker-compose.prod.yml](file:///Users/saurav/Desktop/Desktop/RealStream/docker-compose.prod.yml)
+**File:** `docker-compose.prod.yml`
 
 ```mermaid
 graph LR
@@ -581,7 +586,7 @@ graph LR
 6. `frontend` (after auth-service, content-service)
 7. `nginx` (after frontend, auth-service)
 
-**Environment variables surfaced via [.env](file:///Users/saurav/Desktop/Desktop/RealStream/.env):**
+**Environment variables surfaced via `.env`:**
 
 | Variable | Consumed By |
 |---|---|
@@ -609,10 +614,10 @@ graph LR
 All services use `@RequiredArgsConstructor` + `final` fields. This is the Spring Boot best practice (immutability, testability).
 
 **Repository-only access to data:**
-Controllers never directly access data — they go through [Service](file:///Users/saurav/Desktop/Desktop/RealStream/backend/auth-service/src/main/java/com/realstream/auth/security/CustomOAuth2UserService.java#16-63) → `Repository`. (Some simple controllers go directly to Repository for CRUD-only cases, acceptable for thin services.)
+Controllers never directly access data — they go through `Service` → `Repository`. (Some simple controllers go directly to Repository for CRUD-only cases, acceptable for thin services.)
 
 **`@Transactional` on toggle operations:**
-`InteractionController.toggleLike()` is annotated `@Transactional` to ensure the `existsByUserIdAndVideoId` check and the subsequent `save`/[delete](file:///Users/saurav/Desktop/Desktop/RealStream/backend/comment-service/src/main/java/com/realstream/comment/controller/CommentController.java#44-52) are atomic.
+`InteractionController.toggleLike()` is annotated `@Transactional` to ensure the `existsByUserIdAndVideoId` check and the subsequent `save`/`delete` are atomic.
 
 **Spring Data JPA Patterns:**
 - All repos extend `JpaRepository<Entity, ID>` (PostgreSQL services) or `MongoRepository<Entity, ID>` (content-service)
@@ -632,17 +637,17 @@ JWT secret and expiry are injected via `AppProperties` class (type-safe config b
 
 ### 10.2 Python Service — Standards Applied
 
-- **FastAPI** with Pydantic `BaseModel` for request validation ([ScrapeRequest](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/main.py#29-33))
-- **Environment isolation** with `python-dotenv` ([.env](file:///Users/saurav/Desktop/Desktop/RealStream/.env) file)
-- **Class-based API client** ([YouTubeClient](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#6-133)) — [search_videos](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#10-42), [get_channel_videos](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#43-75), [_map_video_data](file:///Users/saurav/Desktop/Desktop/RealStream/backend/scraper-service/youtube_client.py#99-133) — clear separation of API interaction from business logic
+- **FastAPI** with Pydantic `BaseModel` for request validation (`ScrapeRequest`)
+- **Environment isolation** with `python-dotenv` (`.env` file)
+- **Class-based API client** (`YouTubeClient`) — `search_videos`, `get_channel_videos`, `_map_video_data` — clear separation of API interaction from business logic
 - **Graceful failure:** Each video save is wrapped in try/except — one failure doesn't abort the entire scrape
 - **`CONTENT_SERVICE_URL`** env var for service discovery (default: Docker hostname)
 
 ### 10.3 Frontend — Standards Applied
 
 **Type safety everywhere:**
-- [Video](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#15-27), `Page<T>`, [LikeStatus](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#28-32), [Comment](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts#33-40) interfaces defined in [lib/api.ts](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts)
-- [AuthContextType](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/context/AuthContext.tsx#13-20) interface for context contract
+- `Video`, `Page<T>`, `LikeStatus`, `Comment` interfaces defined in `lib/api.ts`
+- `AuthContextType` interface for context contract
 - All component props are typed
 
 **Server state vs. client state separation:**
@@ -657,7 +662,7 @@ Cleanly handles page accumulation, loading states, and "hasNextPage" detection f
 Auth headers are applied once at the Axios level — components never touch auth headers directly.
 
 **No hardcoded backend URLs in components:**
-All API calls go through [lib/api.ts](file:///Users/saurav/Desktop/Desktop/RealStream/frontend/src/lib/api.ts) service objects. Components call `videoService.getVideos()`, not raw `axios.get(...)`. This is the **Service Layer pattern** applied to frontend.
+All API calls go through `lib/api.ts` service objects. Components call `videoService.getVideos()`, not raw `axios.get(...)`. This is the **Service Layer pattern** applied to frontend.
 
 **Tailwind v4 design tokens:**
 Custom color, font, and animation tokens in `@theme {}` — no magic strings in components, always `text-primary`, `bg-surface`, `text-neon-cyan`.
@@ -726,6 +731,298 @@ Custom color, font, and animation tokens in `@theme {}` — no magic strings in 
 
 ---
 
+*Generated via deep code analysis of RealStream codebase — February 2026*
+
+---
+
+## 12. How Video Streaming Works
+
+> **Key insight: RealStream does NOT stream video itself.** It delegates 100% of video delivery to YouTube's global CDN infrastructure.
+
+### What the app actually stores
+
+MongoDB holds only **metadata** — `videoId`, `title`, `thumbnailUrl`, `channelTitle`, `hashtags`. Not a single video byte is stored or served by RealStream.
+
+### The streaming model
+
+```
+User scrolls to a video
+    ↓
+VideoPlayer.tsx mounts a YouTube iframe:
+  src="https://www.youtube.com/embed/{videoId}
+       ?autoplay=1&loop=1&mute=0
+       &controls=0       ← hides YouTube chrome (TikTok feel)
+       &playsinline=1    ← plays inline on mobile (no forced fullscreen)
+       &rel=0            ← no "related videos" recommendations after
+       &modestbranding=1 ← minimal YouTube logo
+       &playlist={id}    ← required for loop=1 to actually loop"
+    ↓
+YouTube's CDN delivers the video stream directly to the user's browser
+RealStream's servers are NOT in the video data path at all
+```
+
+### Lazy loading — how only 1 video plays at a time
+
+```typescript
+// VideoPlayer.tsx
+useEffect(() => {
+    if (isActive) {
+        // Wait 300ms for CSS scroll-snap to settle BEFORE loading iframe
+        // Prevents loading a video you're already scrolling past
+        const timer = setTimeout(() => setShowEmbed(true), 300);
+        return () => clearTimeout(timer);
+    } else {
+        setShowEmbed(false);  // DESTROY iframe when scrolled away → frees memory + bandwidth
+    }
+}, [isActive]);
+```
+
+- `isActive` is driven by `activeIndex` state in `page.tsx`, which is updated on every scroll event
+- At any moment there is at most **1 active iframe** in the DOM
+- Scrolling away from a video **immediately tears down the player** — no background autoplay
+
+### Before the iframe loads — poster image
+
+While the iframe isn't mounted yet, the component shows the `thumbnailUrl` (a static image from YouTube's CDN) with a play button overlay. This gives instant visual feedback with zero load time.
+
+### Why this approach is production-quality
+
+| Concern | How it's handled |
+|---|---|
+| Bandwidth cost | Zero — YouTube CDN pays for all video delivery |
+| Latency | YouTube has edge nodes everywhere; better than any custom solution |
+| Legal/licensing | Videos remain on YouTube; no copyright issues from hosting |
+| Scalability | Scales to millions of users without touching RealStream's servers |
+| DRM/ads | YouTube handles these automatically inside the iframe |
+
+---
+
+## 13. Concurrency & Multithreading Model
+
+> We have **not written explicit threading code** anywhere in the codebase. Concurrency is fully managed by the frameworks chosen.
+
+### Per-layer breakdown
+
+| Layer | Concurrency mechanism | Detail |
+|---|---|---|
+| **Spring Boot (all Java services)** | Tomcat embedded thread pool | Each HTTP request is dispatched to one of 200 default worker threads. `@Transactional` acquires row-level DB locks automatically. Zero manual thread management needed. |
+| **`@Transactional toggleLike()`** | Database-level locking | The check-then-insert/delete is wrapped in one transaction — RDBMS ensures atomic execution across concurrent requests |
+| **FastAPI (Python scraper)** | Uvicorn ASGI async I/O | Uvicorn uses an event loop — concurrent scrape requests don't block each other. FastAPI `async def` endpoints are non-blocking. |
+| **Next.js (frontend server)** | Node.js event loop | Next.js API rewrites and SSR run on Node's async event loop — no blocking per user |
+| **React 19 (browser)** | Concurrent rendering | React 19's concurrent mode can interrupt, pause, and resume renders. `useTransition` and `Suspense` boundaries handle async state without freezing the UI |
+| **TanStack Query** | Background refetching | While you watch a video, `useInfiniteQuery` prefetches the next page in the background. Cache invalidation after mutations is handled on a separate async tick |
+
+### The one place atomicity was explicitly enforced
+
+```java
+@PostMapping("/likes/{videoId}")
+@Transactional   // ← Marks a DB transaction boundary
+public ResponseEntity<LikeStatus> toggleLike(UUID userId, String videoId) {
+    // These two operations are ATOMIC — no race condition possible
+    boolean exists = likeRepository.existsByUserIdAndVideoId(userId, videoId);
+    if (exists) {
+        likeRepository.deleteByUserIdAndVideoId(userId, videoId);
+    } else {
+        likeRepository.save(Like.builder().userId(userId).videoId(videoId).build());
+    }
+    // ...
+}
+```
+
+Without `@Transactional`, two simultaneous like-clicks from the same user could both pass the `exists` check and insert two rows. The `@Transactional` annotation + the DB-level `UNIQUE(user_id, video_id)` constraint are a two-layer defence.
+
+---
+
+## 14. Environment Variable Management & Security
+
+### The three-layer system
+
+```
+.env                    ← Real secrets (NEVER committed to Git)
+.env.example            ← Template with placeholders (committed to Git)
+docker-compose.prod.yml ← Bridge: reads .env, injects into containers
+```
+
+### Layer 1: `.env` — the secret vault
+
+```dotenv
+# Database Credentials
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+
+# Google OAuth (Required for Login)
+GOOGLE_CLIENT_ID=...apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-...
+
+# YouTube API (Required for Scraper)
+YOUTUBE_API_KEY=AIzaSy...
+
+# Deployment
+FRONTEND_URL=https://realstream.site
+```
+
+**Protected by `.gitignore`:**
+```gitignore
+.env
+.env.*   ← blocks .env.local, .env.production, etc. too
+```
+
+### Layer 2: `.env.example` — the onboarding guide
+
+Safe to commit. Documents what variables are needed without exposing values:
+```dotenv
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+YOUTUBE_API_KEY=your_youtube_api_key_here
+```
+
+New developers: copy → rename to `.env` → fill in real values.
+
+### Layer 3: Docker Compose injection
+
+```yaml
+# docker-compose.prod.yml
+auth-service:
+  environment:
+    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}       # ← reads from .env at runtime
+    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    APP_OAUTH2_FRONTEND_URL: ${FRONTEND_URL}
+
+scraper-service:
+  environment:
+    YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+```
+
+Docker Compose reads `.env` from the same directory at `docker-compose up` time and substitutes the `${VAR}` references. The secrets live only in container environment memory — never written to disk inside the container.
+
+### How each service reads env vars
+
+**Java Spring Boot (auth-service):**
+```yaml
+# application.yml / application.properties (auto-resolved by Spring)
+spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}
+spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}
+```
+Spring Boot reads directly from the process environment. `AppProperties` class provides type-safe access via `@ConfigurationProperties`.
+
+**Python FastAPI (scraper-service):**
+```python
+from dotenv import load_dotenv
+load_dotenv()                              # reads .env in dev
+API_KEY = os.getenv("YOUTUBE_API_KEY")    # reads env var in prod (Docker)
+```
+
+**Next.js (frontend):**
+```
+NEXT_PUBLIC_API_URL=/api   ← not secret (just "/api"), safe to expose
+```
+
+### Security guarantee chain
+
+```
+.env ─(gitignored)─► never reaches GitHub
+  │
+  └─► docker-compose reads at startup time
+        └─► injected into container process environment
+              └─► Spring Boot / Python reads os.environ
+                    └─► never logged, never returned in API response body
+```
+
+> ⚠️ **Important:** Never use `NEXT_PUBLIC_` prefix for secrets in Next.js. Variables with that prefix are **baked into the client-side JavaScript bundle** and visible to anyone who opens browser DevTools. Only non-sensitive config (like `/api`) should use `NEXT_PUBLIC_`.
+
+---
+
+## 15. Database Choice Rationale — PostgreSQL vs MongoDB
+
+### Why PostgreSQL for: auth, user, comment, interaction services
+
+| Reason | Concrete example in RealStream |
+|---|---|
+| **Fixed, stable schema** | `User` always has `id, email, fullName, imageUrl, provider, role`. No variable fields. Relational table is the natural fit. |
+| **ACID transactions** | `toggleLike()` must check-then-insert atomically. PostgreSQL row-level locking guarantees this. MongoDB multi-doc transactions are possible but heavier. |
+| **Unique constraints** | `UNIQUE(user_id, video_id)` on likes — one like per user per video. A single SQL constraint enforces this at the DB level, impossible to violate. |
+| **Relational aggregation** | `COUNT(*)`, `EXISTS()`, `ORDER BY created_at DESC` — all trivial SQL, fast with standard indexes. |
+| **Referential integrity** | `users.id` is referenced by `comments.user_id` and `likes.user_id` across services (by convention, not FK — but the semantics are relational). |
+
+### Why MongoDB for: content-service (videos)
+
+| Reason | Concrete example in RealStream |
+|---|---|
+| **Variable-length arrays as first-class fields** | `hashtags: ["#trending", "#music", "#shorts"]` is a native MongoDB array. `findByHashtagsIn(["#trending"])` becomes a single `$in` index scan. In PostgreSQL you'd need a `video_hashtags` join table. |
+| **Schema flexibility** | YouTube API can add new metadata fields at any time. MongoDB documents absorb new fields without a migration. |
+| **Upsert-heavy write pattern** | Scraper pushes videos in bulk — `findByVideoId → update or insert`. This is a natural MongoDB upsert (`findOneAndReplace`). |
+| **No joins needed** | The feed query is just "give me $N videos matching this hashtag, paginated." A single MongoDB collection scan with a pageable is all that's needed. |
+| **Horizontal scalability potential** | Video content will grow the largest. MongoDB's sharding model lets the content store scale independently from user/interaction data. |
+
+### The core matching principle
+
+```
+Data is relational, structured, transactional?  →  PostgreSQL
+Data is document-shaped, array-heavy, flexible?  →  MongoDB
+```
+
+Putting videos in PostgreSQL would require a `video_hashtags` join table for every feed query. Putting likes in MongoDB would lose the `@Transactional` ACID guarantee needed for toggle atomicity. Each database does exactly what it was designed for.
+
+---
+
+## 16. Production Database Access Guide
+
+### Important gotcha — two separate PostgreSQL instances
+
+```
+Local psql (your Mac)          ←  dev testing only (1 user: your local dev account)
+Docker postgres container      ←  production data (real users who logged in via realstream.site)
+```
+
+When the app runs in production via Docker + Cloudflare Tunnel, all login/comment/like data goes into the **Docker PostgreSQL volume** (`realstream_postgres-data`). Querying local psql shows different data.
+
+### Access the production Docker PostgreSQL
+
+```bash
+# 1. Start only the postgres container (uses existing volume data)
+docker-compose -f docker-compose.prod.yml up -d postgres
+
+# 2. Wait a moment, then query
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT id, email, full_name, provider, role FROM users;"
+
+# 3. Stop when done
+docker-compose -f docker-compose.prod.yml stop postgres
+```
+
+### Useful production queries
+
+```bash
+# All registered users
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT id, email, full_name, provider, role FROM users ORDER BY id;"
+
+# Total user count
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT COUNT(*) as total_users FROM users;"
+
+# All likes (videoId + who liked it)
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT * FROM likes ORDER BY id;"
+
+# All comments
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT * FROM comments ORDER BY created_at DESC;"
+
+# Likes per video (most liked)
+docker exec realstream-postgres-1 psql -U user -d realstream \
+  -c "SELECT video_id, COUNT(*) as like_count FROM likes GROUP BY video_id ORDER BY like_count DESC;"
+```
+
+### Why some login attempts don't create users
+
+Google OAuth in **Testing mode** (Google Cloud Console → OAuth consent screen → not Published) only allows accounts **manually added as Test Users**. Anyone else sees "This app isn't verified" and cannot proceed past Google's screen — their data never reaches `auth-service`, so no user row is created.
+
+**Fix:** Add all tester emails at:  
+Google Cloud Console → APIs & Services → OAuth Consent Screen → **Test users → Add users**
+
+---
+
 ## Appendix: Port Reference
 
 | Service | Internal Port | Docker Hostname |
@@ -743,4 +1040,5 @@ Custom color, font, and animation tokens in `@theme {}` — no magic strings in 
 
 ---
 
-*Generated via deep code analysis of RealStream codebase — February 2026*
+*Last updated: February 2026 — includes video streaming model, concurrency analysis, env var security, DB rationale, and production DB access guide.*
+
