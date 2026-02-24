@@ -149,7 +149,7 @@ export const scraperService = {
             // Note: In dev, Next.js rewrites /api/scraper -> http://localhost:8000
             hashtag: channel ? "" : hashtag,
             channel: channel || undefined,
-            limit: 10
+            limit: 50
         });
         return response.data;
     }

@@ -1,59 +1,67 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Play } from "lucide-react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 
-interface VideoPlayerProps {
-    videoId: string; // YouTube video ID
+interface VideoOverlayProps {
     poster?: string;
     isActive: boolean;
+    isPlaying: boolean;
+    isMuted: boolean;
+    onToggleMute: (e: React.MouseEvent) => void;
 }
 
-export default function VideoPlayer({ videoId, poster, isActive }: VideoPlayerProps) {
-    const [showEmbed, setShowEmbed] = useState(false);
-
-    useEffect(() => {
-        if (isActive) {
-            // Small delay so scroll snap settles before loading iframe
-            const timer = setTimeout(() => setShowEmbed(true), 300);
-            return () => clearTimeout(timer);
-        } else {
-            setShowEmbed(false);
-        }
-    }, [isActive]);
-
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&mute=0&controls=0&playsinline=1&rel=0&showinfo=0&modestbranding=1&playlist=${videoId}`;
+export default function VideoOverlay({
+    poster,
+    isActive,
+    isPlaying,
+    isMuted,
+    onToggleMute
+}: VideoOverlayProps) {
 
     return (
-        <div className="relative w-full h-full bg-black overflow-hidden">
-            {showEmbed ? (
-                <iframe
-                    src={embedUrl}
-                    className="absolute inset-0 w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    style={{ pointerEvents: "auto" }}
-                />
-            ) : (
-                <div
-                    className="absolute inset-0 flex items-center justify-center bg-black cursor-pointer"
-                    onClick={() => setShowEmbed(true)}
-                >
-                    {poster ? (
-                        <img src={poster} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="w-full h-full bg-surface" />
-                    )}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <div className="bg-white/20 backdrop-blur-md p-4 rounded-full">
-                            <Play className="w-8 h-8 text-white fill-white" />
+        <div className="relative w-full h-full bg-transparent overflow-hidden group">
+
+            {/* 1. Loading / Poster Fallback */}
+            {(!isPlaying) && poster && (
+                <div className="absolute inset-0 z-0 flex items-center justify-center bg-transparent pointer-events-none">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={poster} alt="" className="w-full h-full object-cover" />
+                    {isActive && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="bg-black/40 backdrop-blur-md p-4 rounded-full animate-pulse">
+                                <Play className="w-8 h-8 text-white fill-white" />
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             )}
 
-            {/* Gradient Overlay for bottom text readability */}
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+            {/* 2. Mute/Unmute Toggle Button */}
+            {/* Positioned cleanly out of the way, similar to Reels/TikTok native volume controls */}
+            {isActive && (
+                <button
+                    onClick={onToggleMute}
+                    className="absolute top-[80px] right-4 z-30 p-3 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white shadow-lg active:scale-90 transition-transform flex items-center justify-center pointer-events-auto"
+                >
+                    {isMuted ? (
+                        <VolumeX className="w-6 h-6" />
+                    ) : (
+                        <Volume2 className="w-6 h-6" />
+                    )}
+                </button>
+            )}
+
+            {/* Optional Unmute prompt if they haven't figured it out yet */}
+            {isActive && isMuted && isPlaying && (
+                <div className="absolute top-[88px] right-[70px] z-20 pointer-events-none animate-pulse">
+                    <span className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-white text-xs font-bold shadow-lg flex items-center whitespace-nowrap">
+                        Tap to unmute
+                        <div className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-black/60 ml-2"></div>
+                    </span>
+                </div>
+            )}
+
+
         </div>
     );
 }

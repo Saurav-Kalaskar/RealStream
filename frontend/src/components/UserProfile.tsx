@@ -144,7 +144,7 @@ export default function UserProfile({ user, onClose, onLogout }: UserProfileProp
 
                                     <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
                                         <Play className="w-3 h-3 text-white fill-white" />
-                                        <span className="text-xs font-bold text-white">{(Math.random() * 20 + 5).toFixed(1)}k</span>
+                                        <span className="text-xs font-bold text-white">{((i * 3.7) % 20 + 5).toFixed(1)}k</span>
                                     </div>
                                 </div>
                             </div>

@@ -7,7 +7,7 @@ class YouTubeClient:
     def __init__(self, api_key: str):
         self.youtube = build('youtube', 'v3', developerKey=api_key)
 
-    def search_videos(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    def search_videos(self, query: str, limit: int = 50) -> List[Dict[str, Any]]:
         """
         Search for videos using the YouTube Data API.
         Attempts to find 'Shorts' by filtering for short duration videos.
@@ -40,7 +40,7 @@ class YouTubeClient:
             print(f"Error searching videos: {e}")
             return []
 
-    def get_channel_videos(self, channel_name: str, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_channel_videos(self, channel_name: str, limit: int = 50) -> List[Dict[str, Any]]:
         """
         Fetch short videos from a specific channel.
         First resolves the channel ID, then searches for videos from that channel.

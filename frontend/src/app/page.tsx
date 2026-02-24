@@ -3,6 +3,7 @@
 import CommentDrawer from "@/components/CommentDrawer";
 import Onboarding from "@/components/Onboarding";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import FeedPlayer from "@/components/FeedPlayer";
 import VideoPlayer from "@/components/VideoPlayer";
 import ActionBar from "@/components/ActionBar";
 import VideoMetadata from "@/components/VideoMetadata";
@@ -31,7 +32,29 @@ function HomeContent() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Global Player State
+  const [isGlobalMuted, setIsGlobalMuted] = useState(true);
+  const [isGlobalPlaying, setIsGlobalPlaying] = useState(false);
+
+  // Browser history: handle back button
+  useEffect(() => {
+    const handlePopState = () => {
+      // When user presses browser back, return to onboarding
+      setIsOnboarded(false);
+      setCurrentTopic(null);
+      setCurrentChannel(null);
+      queryClient.resetQueries({ queryKey: ["videos"] });
+      sessionStorage.removeItem("rs_onboarded");
+      sessionStorage.removeItem("rs_topic");
+      sessionStorage.removeItem("rs_channel");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [queryClient]);
+
   // Restore session on mount
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedOnboarded = sessionStorage.getItem("rs_onboarded");
@@ -41,6 +64,8 @@ function HomeContent() {
       // Guardrail: Only restore if we have a valid topic OR channel
       if (savedOnboarded === "true" && (savedTopic || savedChannel)) {
         setIsOnboarded(true);
+        // Push history so back button works even after session restore
+        window.history.pushState({ view: "feed" }, "");
         if (savedChannel) {
           setCurrentChannel(savedChannel);
         } else {
@@ -98,6 +123,9 @@ function HomeContent() {
       setIsOnboarded(true);
       sessionStorage.setItem("rs_onboarded", "true");
 
+      // Push browser history so back button returns to search
+      window.history.pushState({ view: "feed" }, "");
+
       if (variables.channel) {
         const canonicalChannel = (data?.videos && data.videos.length > 0 && data.videos[0].channelTitle)
           ? data.videos[0].channelTitle
@@ -124,14 +152,17 @@ function HomeContent() {
     if (index !== activeIndex) {
       setActiveIndex(index);
     }
+  };
 
-    const { scrollTop, clientHeight, scrollHeight } = container;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5) {
+  // Robust infinite scroll: Fetch next page when we get within 3 videos of the end
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (filteredVideos.length > 0 && activeIndex >= filteredVideos.length - 3) {
       if (hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     }
-  };
+  }, [activeIndex, filteredVideos.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleInteractionAttempt = () => {
     if (!user) {
@@ -229,11 +260,27 @@ function HomeContent() {
 
       <main className="flex-grow flex items-center justify-center pointer-events-none relative w-full overflow-hidden">
 
+        <div className="absolute inset-0 pointer-events-auto overflow-hidden hidden md:flex md:w-[480px] md:h-[85vh] md:max-h-[960px] md:mx-auto md:my-auto md:rounded-2xl z-0">
+          {/* FeedPlayer lives strictly in the background */}
+          <FeedPlayer
+            videoId={filteredVideos[activeIndex]?.videoId || null}
+            isMuted={isGlobalMuted}
+            onPlayingChange={setIsGlobalPlaying}
+          />
+        </div>
 
         {/* Pointer events none on container so clicks pass through to background if needed, but auto on content */}
         <div
-          className="pointer-events-auto relative w-full h-full md:w-[480px] md:h-[85vh] md:max-h-[960px] md:rounded-2xl bg-black border border-white/10 shadow-2xl overflow-hidden glass-panel z-10 md:pb-0"
+          className="pointer-events-auto relative w-full h-full md:w-[480px] md:h-[85vh] md:max-h-[960px] md:rounded-2xl bg-transparent border border-white/10 shadow-2xl overflow-hidden z-10 md:pb-0"
         >
+          {/* Mobile background feed wrapper (Because iOS handles absolute centering weirdly) */}
+          <div className="md:hidden absolute inset-0 z-0">
+            <FeedPlayer
+              videoId={filteredVideos[activeIndex]?.videoId || null}
+              isMuted={isGlobalMuted}
+              onPlayingChange={setIsGlobalPlaying}
+            />
+          </div>
           {/* Scrollable Content Area */}
           <div
             className="w-full h-full overflow-y-scroll snap-y snap-mandatory focus:outline-none no-scrollbar"
@@ -249,14 +296,19 @@ function HomeContent() {
             )}
 
             {filteredVideos.map((video, index) => (
-              <div key={video.id} className="w-full h-full snap-start relative">
+              <div key={`${video.id}-${index}`} className="w-full h-full snap-start relative bg-transparent">
                 <VideoPlayer
-                  videoId={video.videoId}
                   poster={video.thumbnailUrl}
                   isActive={index === activeIndex}
+                  isPlaying={index === activeIndex ? isGlobalPlaying : false}
+                  isMuted={isGlobalMuted}
+                  onToggleMute={(e) => {
+                    e.stopPropagation();
+                    setIsGlobalMuted(!isGlobalMuted);
+                  }}
                 />
 
-                <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-end pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-end pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8">
                   <div className="flex flex-row items-end justify-between w-full pointer-events-auto">
                     <VideoMetadata
                       username={video.channelTitle || "@creator"}
@@ -282,23 +334,12 @@ function HomeContent() {
               </div>
             ))}
 
-            {/* Load More / End of Feed Indicator */}
-            <div className="w-full h-20 flex items-center justify-center snap-start text-white/50 text-sm">
-              {isFetchingNextPage ? (
+            {/* Loading spinner only while fetching next page */}
+            {isFetchingNextPage && (
+              <div className="w-full h-20 flex items-center justify-center snap-start text-white/50 text-sm">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
-              ) : hasNextPage ? (
-                <button onClick={() => fetchNextPage()} className="hover:text-white underline">
-                  Load More
-                </button>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <span>You're all caught up!</span>
-                  <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-neon-cyan text-xs">
-                    Back to Top
-                  </button>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {commentDrawerVideoId && (

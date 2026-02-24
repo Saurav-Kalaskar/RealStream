@@ -13,7 +13,7 @@ export default function VideoMetadata({ username, caption, hashtags }: VideoMeta
             <p className="text-sm drop-shadow-sm line-clamp-2">{caption}</p>
             <div className="flex flex-wrap gap-2 text-sm font-semibold text-white/90">
                 {hashtags.map((tag) => (
-                    <span key={tag}>#{tag}</span>
+                    <span key={tag}>#{tag.replace(/^#/, '')}</span>
                 ))}
             </div>
         </div>
