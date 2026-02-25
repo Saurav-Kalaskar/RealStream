@@ -166,10 +166,10 @@ class YouTubeClient:
             phrase_keywords = [w.strip().lower() for w in phrase.split() if w.strip()]
             relevance_kws = list(set(original_keywords + phrase_keywords))
             print(f"Searching related: '{search_query}' → tag: {phrase_tag}")
-            # Only tag with phrase-specific tag, NOT the primary tag
-            # This prevents related videos from polluting the primary feed
+            # Tag with BOTH the primary tag (so they extend the main feed)
+            # and the phrase-specific tag
             self._do_search(search_query, limit_per_topic,
-                            [phrase_tag], all_results, seen_ids,
+                            [primary_tag, phrase_tag], all_results, seen_ids,
                             relevance_kws)
 
         print(f"Total related videos found: {len(all_results)}")
