@@ -260,21 +260,12 @@ function HomeContent() {
 
       <main className="flex-grow flex items-center justify-center pointer-events-none relative w-full overflow-hidden">
 
-        <div className="absolute inset-0 pointer-events-auto overflow-hidden hidden md:flex md:w-[480px] md:h-[85vh] md:max-h-[960px] md:mx-auto md:my-auto md:rounded-2xl z-0">
-          {/* FeedPlayer lives strictly in the background */}
-          <FeedPlayer
-            videoId={filteredVideos[activeIndex]?.videoId || null}
-            isMuted={isGlobalMuted}
-            onPlayingChange={setIsGlobalPlaying}
-          />
-        </div>
-
         {/* Pointer events none on container so clicks pass through to background if needed, but auto on content */}
         <div
           className="pointer-events-auto relative w-full h-full md:w-[480px] md:h-[85vh] md:max-h-[960px] md:rounded-2xl bg-transparent border border-white/10 shadow-2xl overflow-hidden z-10 md:pb-0"
         >
-          {/* Mobile background feed wrapper (Because iOS handles absolute centering weirdly) */}
-          <div className="md:hidden absolute inset-0 z-0">
+          {/* Single FeedPlayer in the background — one instance for all screen sizes */}
+          <div className="absolute inset-0 z-0">
             <FeedPlayer
               videoId={filteredVideos[activeIndex]?.videoId || null}
               isMuted={isGlobalMuted}
@@ -298,7 +289,6 @@ function HomeContent() {
             {filteredVideos.map((video, index) => (
               <div key={`${video.id}-${index}`} className="w-full h-full snap-start relative bg-transparent">
                 <VideoPlayer
-                  poster={video.thumbnailUrl}
                   isActive={index === activeIndex}
                   isPlaying={index === activeIndex ? isGlobalPlaying : false}
                   isMuted={isGlobalMuted}

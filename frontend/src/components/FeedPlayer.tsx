@@ -62,13 +62,8 @@ export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPl
 
             containerRef.current.innerHTML = "";
             const playerDiv = document.createElement("div");
-            playerDiv.style.position = "absolute";
-            playerDiv.style.top = "50%";
-            playerDiv.style.left = "50%";
-            playerDiv.style.width = "300%";  // Oversized to eliminate letterboxing
-            playerDiv.style.height = "300%";
-            playerDiv.style.transform = "translate(-50%, -50%)";
-            playerDiv.style.objectFit = "cover";
+            playerDiv.style.width = "100%";
+            playerDiv.style.height = "100%";
             containerRef.current.appendChild(playerDiv);
 
             playerRef.current = new window.YT.Player(playerDiv, {
