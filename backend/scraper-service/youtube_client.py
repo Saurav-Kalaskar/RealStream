@@ -69,12 +69,13 @@ class YouTubeClient:
                 if not video_data or video_data['videoId'] in seen_ids:
                     continue
 
-                # Relevance filter: title or channel must contain at least one keyword
+                # Relevance filter: title or channel must contain ALL keywords
+                # This prevents 'Amazon Jungle' from passing for 'Amazon DSA'
                 if relevance_keywords:
                     title_lower = video_data['title'].lower()
                     channel_lower = video_data.get('channelTitle', '').lower()
                     combined_text = f"{title_lower} {channel_lower}"
-                    if not any(kw in combined_text for kw in relevance_keywords):
+                    if not all(kw in combined_text for kw in relevance_keywords):
                         print(f"  Filtered out (irrelevant): {video_data['title']}")
                         continue
 
@@ -165,8 +166,10 @@ class YouTubeClient:
             phrase_keywords = [w.strip().lower() for w in phrase.split() if w.strip()]
             relevance_kws = list(set(original_keywords + phrase_keywords))
             print(f"Searching related: '{search_query}' → tag: {phrase_tag}")
+            # Only tag with phrase-specific tag, NOT the primary tag
+            # This prevents related videos from polluting the primary feed
             self._do_search(search_query, limit_per_topic,
-                            [primary_tag, phrase_tag], all_results, seen_ids,
+                            [phrase_tag], all_results, seen_ids,
                             relevance_kws)
 
         print(f"Total related videos found: {len(all_results)}")

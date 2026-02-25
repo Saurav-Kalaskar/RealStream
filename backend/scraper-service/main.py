@@ -30,6 +30,26 @@ class ScrapeRequest(BaseModel):
     hashtag: Optional[str] = None
     channel: Optional[str] = None
     limit: int = 25  # Per-keyword limit
+    clear: bool = True  # Clear old videos for this search before saving new ones
+
+def clear_videos_in_content_service(hashtag: Optional[str] = None, channel: Optional[str] = None):
+    """Delete old videos for a given hashtag or channel from the content service."""
+    import requests
+    content_service_url = os.getenv("CONTENT_SERVICE_URL", "http://content-service:8083")
+    try:
+        params = {}
+        if hashtag:
+            params['hashtag'] = hashtag
+        if channel:
+            params['channel'] = channel
+        
+        response = requests.delete(f"{content_service_url}/videos", params=params)
+        if response.status_code in [200, 204]:
+            print(f"Cleared old videos for hashtag='{hashtag}', channel='{channel}'")
+        else:
+            print(f"Failed to clear old videos: {response.text}")
+    except Exception as e:
+        print(f"Error calling clear on content service: {e}")
 
 def save_videos_to_content_service(videos: list) -> int:
     """Save a list of video dicts to the content service. Returns count saved."""
@@ -84,6 +104,10 @@ async def scrape_videos(request: ScrapeRequest):
     
     else:
         raise HTTPException(status_code=400, detail="Either 'hashtag' or 'channel' must be provided")
+
+    # Clear old videos before saving the new fresh batch
+    if request.clear:
+        clear_videos_in_content_service(hashtag=request.hashtag, channel=request.channel)
 
     saved_count = save_videos_to_content_service(results)
 

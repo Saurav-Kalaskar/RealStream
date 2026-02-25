@@ -16,4 +16,7 @@ public interface VideoRepository extends MongoRepository<Video, String> {
     Page<Video> findByHashtagsIn(List<String> hashtags, Pageable pageable);
 
     Page<Video> findByChannelTitle(String channelTitle, Pageable pageable);
+
+    void deleteByHashtagsIn(List<String> hashtags);
+    void deleteByChannelTitle(String channelTitle);
 }

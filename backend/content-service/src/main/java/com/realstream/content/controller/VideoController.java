@@ -61,6 +61,25 @@ public class VideoController {
         return ResponseEntity.ok(videoRepository.findAll(pageable));
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deleteVideos(
+            @RequestParam(required = false) String hashtag,
+            @RequestParam(required = false) String channel) {
+
+        if (hashtag != null && !hashtag.isBlank()) {
+            String normalized = "#" + hashtag.trim().toLowerCase().replaceAll("\\s+", "-");
+            videoRepository.deleteByHashtagsIn(List.of(normalized));
+            return ResponseEntity.ok().build();
+        }
+
+        if (channel != null && !channel.isBlank()) {
+            videoRepository.deleteByChannelTitle(channel);
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.badRequest().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Video> getVideo(@PathVariable String id) {
         return videoRepository.findById(id)
