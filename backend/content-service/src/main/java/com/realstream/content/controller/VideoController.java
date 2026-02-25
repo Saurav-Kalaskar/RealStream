@@ -44,9 +44,14 @@ public class VideoController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         if (hashtag != null && !hashtag.isBlank()) {
-            // Normalize: ensure hashtag starts with #
-            String normalizedTag = hashtag.startsWith("#") ? hashtag : "#" + hashtag;
-            Page<Video> videos = videoRepository.findByHashtagsIn(List.of(normalizedTag), pageable);
+            // Split multi-word queries like "DSA Amazon" into individual hashtags
+            String[] words = hashtag.trim().split("\\s+");
+            List<String> normalizedTags = new java.util.ArrayList<>();
+            for (String word : words) {
+                String tag = word.startsWith("#") ? word : "#" + word;
+                normalizedTags.add(tag);
+            }
+            Page<Video> videos = videoRepository.findByHashtagsIn(normalizedTags, pageable);
             return ResponseEntity.ok(videos);
         }
 

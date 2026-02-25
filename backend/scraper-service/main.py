@@ -29,7 +29,7 @@ client = YouTubeClient(API_KEY) if API_KEY else None
 class ScrapeRequest(BaseModel):
     hashtag: Optional[str] = None
     channel: Optional[str] = None
-    limit: int = 10
+    limit: int = 50
 
 @app.post("/scrape")
 async def scrape_videos(request: ScrapeRequest):
@@ -43,7 +43,7 @@ async def scrape_videos(request: ScrapeRequest):
         print(f"Searching channel: {request.channel}")
         results = client.get_channel_videos(request.channel, request.limit)
     
-    # Priority 2: Topic Search
+    # Priority 2: Topic Search (multi-word queries supported)
     elif request.hashtag:
         print(f"Searching topic: {request.hashtag}")
         results = client.search_videos(request.hashtag, request.limit)
@@ -55,15 +55,15 @@ async def scrape_videos(request: ScrapeRequest):
     saved_count = 0
     for video in results:
         try:
-            # POST to Content Service
-            # URL: http://localhost:8083/videos
-            # We need to map the video object to what Content Service expects
+            # The youtube_client now returns 'hashtags' as a list
+            video_hashtags = video.get('hashtags', [])
+            
             payload = {
                 "videoId": video['videoId'],
                 "title": video['title'],
-                "description": video['title'], # Use title as description for now
+                "description": video['title'],
                 "url": video['url'],
-                "hashtags": [f"#{request.hashtag}" if not request.hashtag.startswith("#") else request.hashtag] if request.hashtag else [video['channelTitle']], # Normalize to #hashtag
+                "hashtags": video_hashtags,  # Now a proper list of hashtags
                 "thumbnailUrl": video['thumbnailUrl'],
                 "channelTitle": video['channelTitle'],
                 "duration": video['duration'],

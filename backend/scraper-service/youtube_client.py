@@ -10,12 +10,20 @@ class YouTubeClient:
     def search_videos(self, query: str, limit: int = 50) -> List[Dict[str, Any]]:
         """
         Search for videos using the YouTube Data API.
-        Attempts to find 'Shorts' by filtering for short duration videos.
+        Supports multi-word queries like "DSA Amazon" by combining all words
+        into a hashtag-style query for better YouTube Shorts results.
         """
-        # Add "shorts" to query to bias results towards Shorts content
-        search_query = query
+        # Split query into individual keywords for hashtag generation
+        keywords = [w.strip() for w in query.split() if w.strip()]
+
+        # Build a combined search query with all keywords + "shorts"
+        # e.g., "DSA Amazon" → "DSA Amazon #DSA #Amazon shorts"
+        hashtag_part = " ".join(f"#{kw}" for kw in keywords)
+        search_query = f"{query} {hashtag_part}"
         if "shorts" not in query.lower():
-            search_query = f"{query} shorts"
+            search_query += " shorts"
+
+        print(f"YouTube search query: {search_query}")
 
         try:
             request = self.youtube.search().list(
@@ -29,9 +37,12 @@ class YouTubeClient:
             )
             response = request.execute()
             
+            # Generate hashtags list from the original keywords
+            hashtags = [f"#{kw}" for kw in keywords]
+
             results = []
             for item in response.get('items', []):
-                video_data = self._map_video_data(item, query)
+                video_data = self._map_video_data(item, hashtags)
                 if video_data:
                     results.append(video_data)
             
@@ -64,7 +75,7 @@ class YouTubeClient:
 
             results = []
             for item in response.get('items', []):
-                video_data = self._map_video_data(item, f"@{channel_name}")
+                video_data = self._map_video_data(item, [f"@{channel_name}"])
                 if video_data:
                     results.append(video_data)
             
@@ -96,9 +107,10 @@ class YouTubeClient:
         
         return None
 
-    def _map_video_data(self, item: Dict[str, Any], source_query: str) -> Dict[str, Any]:
+    def _map_video_data(self, item: Dict[str, Any], hashtags: List[str]) -> Dict[str, Any]:
         """
         Map YouTube API item to internal Video format.
+        hashtags is now a list of hashtag strings (e.g., ["#DSA", "#Amazon"]).
         """
         try:
             snippet = item['snippet']
@@ -117,14 +129,11 @@ class YouTubeClient:
                 'title': snippet['title'],
                 'url': f"https://www.youtube.com/shorts/{video_id}",
                 'thumbnailUrl': thumbnail_url,
-                # Duration is not available in search results snippet. 
-                # We assume it fits criteria because of videoDuration='short' filter.
-                # If strict duration is needed, we must fetch contentDetails separately.
                 'duration': 60, 
-                'viewCount': 0, # Not available in search snippet
+                'viewCount': 0,
                 'uploadDate': snippet['publishedAt'],
                 'channelTitle': snippet['channelTitle'],
-                'hashtag': source_query,
+                'hashtags': hashtags,  # Now a list of hashtag strings
                 'width': 0,
                 'height': 0
             }
