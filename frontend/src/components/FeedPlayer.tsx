@@ -49,6 +49,7 @@ export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPl
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const playerRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const notPlayingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isPlayerReady, setIsPlayerReady] = useState(false);
 
     // 1. Initialize Player once
@@ -100,9 +101,20 @@ export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPl
                     onStateChange: (event: any) => {
                         if (!isMounted) return;
                         if (event.data === 1) { // Playing
+                            // Clear any pending "not playing" timer
+                            if (notPlayingTimerRef.current) {
+                                clearTimeout(notPlayingTimerRef.current);
+                                notPlayingTimerRef.current = null;
+                            }
                             onPlayingChange(true);
-                        } else if (event.data === 2 || event.data === -1) { // Paused or Unstarted
-                            onPlayingChange(false);
+                        } else if (event.data === 2 || event.data === -1 || event.data === 3) {
+                            // Paused, Unstarted, or Buffering — debounce to avoid poster flash
+                            if (!notPlayingTimerRef.current) {
+                                notPlayingTimerRef.current = setTimeout(() => {
+                                    onPlayingChange(false);
+                                    notPlayingTimerRef.current = null;
+                                }, 500);
+                            }
                         } else if (event.data === 0) { // Ended
                             event.target.playVideo(); // Force loop
                         }
@@ -115,6 +127,10 @@ export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPl
 
         return () => {
             isMounted = false;
+            if (notPlayingTimerRef.current) {
+                clearTimeout(notPlayingTimerRef.current);
+                notPlayingTimerRef.current = null;
+            }
             if (playerRef.current) {
                 try { playerRef.current.destroy(); } catch { /* ignore */ }
                 playerRef.current = null;

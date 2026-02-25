@@ -21,12 +21,12 @@ export default function VideoOverlay({
     return (
         <div className="relative w-full h-full bg-transparent overflow-hidden group">
 
-            {/* 1. Loading / Poster Fallback */}
-            {(!isPlaying) && poster && (
-                <div className="absolute inset-0 z-0 flex items-center justify-center bg-transparent pointer-events-none">
+            {/* 1. Loading / Poster Fallback — always present, fades out when playing */}
+            {poster && (
+                <div className={`absolute inset-0 z-0 flex items-center justify-center bg-transparent pointer-events-none transition-opacity duration-500 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={poster} alt="" className="w-full h-full object-cover" />
-                    {isActive && (
+                    {isActive && !isPlaying && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div className="bg-black/40 backdrop-blur-md p-4 rounded-full animate-pulse">
                                 <Play className="w-8 h-8 text-white fill-white" />
