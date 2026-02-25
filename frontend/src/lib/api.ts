@@ -160,11 +160,18 @@ export const commentService = {
 
 export const scraperService = {
     async scrape(hashtag: string, channel?: string): Promise<{ message: string; count: number; videos?: Video[] }> {
-        const response = await api.post("/scraper/scrape", { // Using the new scraper service URL (proxied via Next.js or direct)
-            // Note: In dev, Next.js rewrites /api/scraper -> http://localhost:8000
+        const response = await api.post("/scraper/scrape", {
             hashtag: channel ? "" : hashtag,
             channel: channel || undefined,
-            limit: 50
+            limit: 25
+        });
+        return response.data;
+    },
+
+    async scrapeRelated(hashtag: string, channel?: string): Promise<{ message: string; count: number; relatedKeywords?: string[]; videos?: Video[] }> {
+        const response = await api.post("/scraper/scrape/related", {
+            hashtag: channel ? "" : hashtag,
+            channel: channel || undefined,
         });
         return response.data;
     }

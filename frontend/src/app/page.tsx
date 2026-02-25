@@ -13,7 +13,7 @@ import Header from "@/components/Header";
 
 
 import { videoService, scraperService } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ArrowLeft } from "lucide-react";
 
@@ -98,6 +98,28 @@ function HomeContent() {
     enabled: isOnboarded,
   });
 
+  // Auto-fetch related videos when the primary feed runs out
+  const relatedFetchedRef = useRef(false);
+  const lastPage = data?.pages[data.pages.length - 1];
+  useEffect(() => {
+    if (
+      lastPage?.last &&
+      !relatedFetchedRef.current &&
+      (currentTopic || currentChannel)
+    ) {
+      relatedFetchedRef.current = true;
+      console.log("Primary feed ended, fetching related videos...");
+      scraperService
+        .scrapeRelated(currentTopic || currentChannel || "", currentChannel || undefined)
+        .then((result) => {
+          console.log("Related videos fetched:", result.count, "Related keywords:", result.relatedKeywords);
+          // Invalidate to pick up the newly saved related videos
+          queryClient.invalidateQueries({ queryKey: ["videos"] });
+        })
+        .catch((err) => console.error("Failed to fetch related videos:", err));
+    }
+  }, [lastPage?.last, currentTopic, currentChannel, queryClient]);
+
   // Flatten pages into a single array of videos
   const videos = data?.pages.flatMap((page) => page.content) || [];
   const filteredVideos = videos;
@@ -118,6 +140,7 @@ function HomeContent() {
       return result;
     },
     onSuccess: (data, variables) => {
+      relatedFetchedRef.current = false; // Reset so related videos can be fetched for new topic
       queryClient.resetQueries({ queryKey: ["videos"] });
       queryClient.invalidateQueries({ queryKey: ["videos"] });
       setIsOnboarded(true);
