@@ -4,32 +4,25 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { commentService, userService } from "@/lib/api";
+import { commentService } from "@/lib/api";
 
 const CommentItem = ({ comment }: { comment: any }) => {
-    const { data: user } = useQuery({
-        queryKey: ["user", comment.userId],
-        queryFn: () => userService.getUserProfile(comment.userId),
-        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    });
+    const name = comment.displayName || "User";
+    const initial = name[0]?.toUpperCase() || "?";
 
     return (
         <div className="flex gap-3">
             {/* Avatar */}
             <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden bg-white/10">
-                {user?.profileImageUrl ? (
-                    <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover" />
-                ) : (
-                    <div className="w-full h-full bg-gradient-to-tr from-neon-cyan to-neon-magenta flex items-center justify-center text-xs font-bold text-white">
-                        {user?.username?.[0]?.toUpperCase() || "?"}
-                    </div>
-                )}
+                <div className="w-full h-full bg-gradient-to-tr from-neon-cyan to-neon-magenta flex items-center justify-center text-xs font-bold text-white">
+                    {initial}
+                </div>
             </div>
 
             <div className="flex-1 space-y-1">
                 <div className="flex items-baseline gap-2">
                     <span className="text-sm font-semibold text-white/90">
-                        {user?.username || `User ${comment.userId.substring(0, 4)}`}
+                        {name}
                     </span>
                     <span className="text-xs text-white/40">
                         {new Date(comment.createdAt).toLocaleDateString()}

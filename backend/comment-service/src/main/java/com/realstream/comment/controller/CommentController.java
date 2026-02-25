@@ -26,6 +26,7 @@ public class CommentController {
                 .userId(userId)
                 .videoId(request.getVideoId())
                 .content(request.getContent())
+                .displayName(request.getDisplayName())
                 .build();
                 
         return ResponseEntity.ok(commentRepository.save(comment));

@@ -35,6 +35,7 @@ export interface Comment {
     videoId: string;
     userId: string;
     content: string;
+    displayName?: string;
     createdAt: string;
 }
 
@@ -61,6 +62,18 @@ function getUserId(): string {
     try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         return payload.sub || "";
+    } catch {
+        return "";
+    }
+}
+
+function getUserName(): string {
+    if (typeof window === "undefined") return "";
+    const token = localStorage.getItem("token");
+    if (!token) return "";
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.name || payload.email || "";
     } catch {
         return "";
     }
@@ -126,9 +139,11 @@ export const commentService = {
 
     async addComment(videoId: string, content: string): Promise<Comment> {
         const userId = getUserId();
+        const displayName = getUserName();
         const response = await api.post<Comment>(`/comments`, {
             videoId,
-            content
+            content,
+            displayName
         }, {
             headers: { "X-User-Id": userId }
         });

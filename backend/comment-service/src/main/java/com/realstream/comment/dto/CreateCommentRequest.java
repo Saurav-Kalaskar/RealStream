@@ -6,4 +6,5 @@ import lombok.Data;
 public class CreateCommentRequest {
     private String videoId;
     private String content;
+    private String displayName;
 }

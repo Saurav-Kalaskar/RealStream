@@ -31,6 +31,8 @@ public class Comment {
     @Column(nullable = false, length = 1000)
     private String content;
 
+    private String displayName; // Google display name of the commenter
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
