@@ -95,12 +95,12 @@ async def scrape_videos(request: ScrapeRequest):
     # Priority 1: Channel Search
     if request.channel:
         print(f"Searching channel: {request.channel}")
-        results = client.get_channel_videos(request.channel, request.limit)
+        results = client.get_channel_videos_deep(request.channel, request.limit, is_fresh_search=request.clear)
     
     # Priority 2: Topic Search — per-keyword for broader results
     elif request.hashtag:
         print(f"Searching topic: {request.hashtag}")
-        results = client.search_videos(request.hashtag, request.limit)
+        results = client.search_videos_deep(request.hashtag, request.limit, is_fresh_search=request.clear)
     
     else:
         raise HTTPException(status_code=400, detail="Either 'hashtag' or 'channel' must be provided")
@@ -121,28 +121,29 @@ async def scrape_videos(request: ScrapeRequest):
 @app.post("/scrape/related")
 async def scrape_related_videos(request: ScrapeRequest):
     """
-    Scrape related videos using Datamuse API to find semantically related
-    keywords, then search YouTube for each. Called when the primary feed runs out.
+    Extends the infinite feed by continuing the deep pagination of the original topic.
+    Called when the primary feed runs out.
     """
     if not client:
         raise HTTPException(status_code=500, detail="YouTube API Key not configured")
 
-    query = request.hashtag or request.channel or ""
-    if not query:
+    if not request.hashtag and not request.channel:
         raise HTTPException(status_code=400, detail="A search query is required")
 
-    print(f"Fetching related videos for: {query}")
-    results = client.search_related_videos(query, limit_per_topic=10)
+    print(f"Extending infinite feed for: {request.hashtag or request.channel}")
+    
+    if request.channel:
+        results = client.get_channel_videos_deep(request.channel, request.limit, is_fresh_search=False)
+    else:
+        results = client.search_videos_deep(request.hashtag, request.limit, is_fresh_search=False)
+        
     saved_count = save_videos_to_content_service(results)
 
-    # Also return the related keywords so the frontend can display them
-    related_keywords = client.get_related_keywords(query)
-
     return {
-        "message": f"Found {len(results)} related videos, Saved {saved_count}",
+        "message": f"Found {len(results)} more videos, Saved {saved_count}",
         "count": len(results),
         "saved_count": saved_count,
-        "relatedKeywords": related_keywords,
+        "relatedKeywords": [], # Deprecated: Datamuse logic removed
         "videos": results 
     }
 
