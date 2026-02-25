@@ -26,24 +26,32 @@ class YouTubeClient:
         Search YouTube for the FULL combined phrase.
         Tags all results with a single combined hashtag so the content service
         only returns videos from this exact search — no cross-contamination.
+        Filters out irrelevant results by checking the video title.
         
         'Amazon DSA' → searches YouTube for "Amazon DSA #shorts"
                      → tags every result with '#amazon-dsa'
+                     → discards videos whose title doesn't match any keyword
         """
+        keywords = [w.strip().lower() for w in query.split() if w.strip()]
         tag = normalize_hashtag(query)
         search_query = f"{query} #shorts"
         print(f"YouTube search: '{search_query}' → tag: {tag}")
 
         all_results = []
         seen_ids: Set[str] = set()
-        self._do_search(search_query, limit, [tag], all_results, seen_ids)
+        self._do_search(search_query, limit, [tag], all_results, seen_ids, keywords)
 
-        print(f"Found {len(all_results)} videos for '{query}'")
+        print(f"Found {len(all_results)} relevant videos for '{query}'")
         return all_results
 
     def _do_search(self, search_query: str, limit: int, hashtags: List[str],
-                   results: List[Dict[str, Any]], seen_ids: Set[str]):
-        """Execute a YouTube search and append unique results."""
+                   results: List[Dict[str, Any]], seen_ids: Set[str],
+                   relevance_keywords: List[str] = None):
+        """
+        Execute a YouTube search and append unique results.
+        If relevance_keywords is provided, only keep videos whose title
+        or channel name contains at least one keyword.
+        """
         try:
             request = self.youtube.search().list(
                 part="snippet",
@@ -58,9 +66,20 @@ class YouTubeClient:
 
             for item in response.get('items', []):
                 video_data = self._map_video_data(item, hashtags)
-                if video_data and video_data['videoId'] not in seen_ids:
-                    seen_ids.add(video_data['videoId'])
-                    results.append(video_data)
+                if not video_data or video_data['videoId'] in seen_ids:
+                    continue
+
+                # Relevance filter: title or channel must contain at least one keyword
+                if relevance_keywords:
+                    title_lower = video_data['title'].lower()
+                    channel_lower = video_data.get('channelTitle', '').lower()
+                    combined_text = f"{title_lower} {channel_lower}"
+                    if not any(kw in combined_text for kw in relevance_keywords):
+                        print(f"  Filtered out (irrelevant): {video_data['title']}")
+                        continue
+
+                seen_ids.add(video_data['videoId'])
+                results.append(video_data)
         except Exception as e:
             print(f"Error in search '{search_query}': {e}")
 
@@ -133,6 +152,8 @@ class YouTubeClient:
         """
         related_phrases = self.get_related_keywords(query)
         primary_tag = normalize_hashtag(query)
+        # Use original keywords for relevance filtering
+        original_keywords = [w.strip().lower() for w in query.split() if w.strip()]
 
         all_results = []
         seen_ids: Set[str] = set()
@@ -140,11 +161,13 @@ class YouTubeClient:
         for phrase in related_phrases:
             phrase_tag = normalize_hashtag(phrase)
             search_query = f"{phrase} #shorts"
+            # Relevance keywords = original keywords + phrase keywords
+            phrase_keywords = [w.strip().lower() for w in phrase.split() if w.strip()]
+            relevance_kws = list(set(original_keywords + phrase_keywords))
             print(f"Searching related: '{search_query}' → tag: {phrase_tag}")
-            # Tag with BOTH the primary tag (so they show in the primary feed)
-            # and the phrase-specific tag
             self._do_search(search_query, limit_per_topic,
-                            [primary_tag, phrase_tag], all_results, seen_ids)
+                            [primary_tag, phrase_tag], all_results, seen_ids,
+                            relevance_kws)
 
         print(f"Total related videos found: {len(all_results)}")
         return all_results
