@@ -146,14 +146,15 @@ class YouTubeClient:
         print(f"Related phrases for '{query}': {result}")
         return result
 
-    def search_related_videos(self, query: str, limit_per_topic: int = 10) -> List[Dict[str, Any]]:
+    def search_related_videos(self, query: str, limit_per_topic: int = 20) -> List[Dict[str, Any]]:
         """
         Fetch related videos. Each related phrase gets its own combined tag
         so it doesn't pollute the primary feed.
         """
         related_phrases = self.get_related_keywords(query)
         primary_tag = normalize_hashtag(query)
-        # Use original keywords for relevance filtering
+        # Use ONLY original keywords for relevance filtering
+        # We don't want to strictly require words like 'interview' or 'tutorial' from Datamuse
         original_keywords = [w.strip().lower() for w in query.split() if w.strip()]
 
         all_results = []
@@ -162,15 +163,13 @@ class YouTubeClient:
         for phrase in related_phrases:
             phrase_tag = normalize_hashtag(phrase)
             search_query = f"{phrase} #shorts"
-            # Relevance keywords = original keywords + phrase keywords
-            phrase_keywords = [w.strip().lower() for w in phrase.split() if w.strip()]
-            relevance_kws = list(set(original_keywords + phrase_keywords))
-            print(f"Searching related: '{search_query}' → tag: {phrase_tag}")
+            print(f"Searching related: '{search_query}' → tags: {primary_tag}, {phrase_tag}")
             # Tag with BOTH the primary tag (so they extend the main feed)
-            # and the phrase-specific tag
+            # and the phrase-specific tag.
+            # ONLY enforce original keywords for relevance. 
             self._do_search(search_query, limit_per_topic,
                             [primary_tag, phrase_tag], all_results, seen_ids,
-                            relevance_kws)
+                            original_keywords)
 
         print(f"Total related videos found: {len(all_results)}")
         return all_results
