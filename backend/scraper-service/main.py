@@ -79,8 +79,8 @@ async def scrape_videos(request: ScrapeRequest):
     
     # Priority 2: Topic Search — per-keyword for broader results
     elif request.hashtag:
-        print(f"Searching topic (per-keyword): {request.hashtag}")
-        results = client.search_videos_per_keyword(request.hashtag, request.limit)
+        print(f"Searching topic (combined): {request.hashtag}")
+        results = client.search_videos_combined(request.hashtag, request.limit)
     
     else:
         raise HTTPException(status_code=400, detail="Either 'hashtag' or 'channel' must be provided")
