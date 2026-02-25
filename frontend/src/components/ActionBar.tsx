@@ -104,7 +104,7 @@ export default function ActionBar({
                     className="p-3 rounded-full bg-white/10 backdrop-blur-md active:bg-white/20 transition-colors"
                 >
                     <Heart
-                        className={`w-8 h-8 ${likeStatus.isLiked ? "fill-neon-magenta text-neon-magenta" : "text-white"}`}
+                        className={`w-8 h-8 ${likeStatus.isLiked ? "fill-red-500 text-red-500" : "text-white"}`}
                         strokeWidth={likeStatus.isLiked ? 0 : 2}
                     />
                 </motion.button>

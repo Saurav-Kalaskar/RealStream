@@ -64,10 +64,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [checkUser]);
 
     const login = useCallback(() => {
-        // Redirect to the backend OAuth2 endpoint
-        // Using relative path so it goes through Nginx -> Auth Service
-        window.location.href = "/api/auth/oauth2/authorization/google";
-    }, []);
+        // Open a popup for OAuth so we don't lose the main page's state (infinite scroll)
+        const width = 500;
+        const height = 600;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        const popup = window.open(
+            "/api/auth/oauth2/authorization/google",
+            "Google Login",
+            `width=${width},height=${height},left=${left},top=${top}`
+        );
+
+        if (!popup) {
+            // Fallback if popup blocker is aggressive
+            window.location.href = "/api/auth/oauth2/authorization/google";
+            return;
+        }
+
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) return;
+
+            if (event.data?.type === "OAUTH_SUCCESS") {
+                const token = event.data.token;
+                localStorage.setItem("token", token);
+                checkUser();
+
+                window.removeEventListener("message", handleMessage);
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+    }, [checkUser]);
 
     const logout = useCallback(async () => {
         try {

@@ -177,6 +177,13 @@ function HomeContent() {
     }
   };
 
+  // Auto-close login modal when user logs in successfully via popup
+  useEffect(() => {
+    if (user && isLoginModalOpen) {
+      setIsLoginModalOpen(false);
+    }
+  }, [user, isLoginModalOpen]);
+
   // Robust infinite scroll: Fetch next page when we get within 3 videos of the end
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {

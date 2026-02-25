@@ -12,11 +12,19 @@ function RedirectHandler() {
     useEffect(() => {
         const token = searchParams.get("token");
         if (token) {
-            localStorage.setItem("token", token);
-            // Force AuthContext to pick up the new token
-            checkUser().then(() => {
-                router.push("/");
-            });
+            // Check if we are running inside a popup window
+            if (window.opener && !window.opener.closed) {
+                // Send the token back to the main application window
+                window.opener.postMessage({ type: "OAUTH_SUCCESS", token }, window.location.origin);
+                window.close(); // Close the popup
+            } else {
+                // Fallback for full-page redirect
+                localStorage.setItem("token", token);
+                // Force AuthContext to pick up the new token
+                checkUser().then(() => {
+                    router.push("/");
+                });
+            }
         } else {
             console.error("No token found in redirect");
             router.push("/");
