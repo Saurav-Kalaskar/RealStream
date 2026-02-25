@@ -6,47 +6,39 @@ from typing import List, Dict, Any, Set
 
 DATAMUSE_API = "https://api.datamuse.com/words"
 
+
+def normalize_hashtag(query: str) -> str:
+    """
+    Convert a search query into a single normalized hashtag.
+    'Amazon DSA' → '#amazon-dsa'
+    'cooking vlog' → '#cooking-vlog'
+    """
+    words = [w.strip().lower() for w in query.split() if w.strip()]
+    return "#" + "-".join(words)
+
+
 class YouTubeClient:
     def __init__(self, api_key: str):
         self.youtube = build('youtube', 'v3', developerKey=api_key)
 
-    def search_videos_combined(self, query: str, limit: int = 50) -> List[Dict[str, Any]]:
+    def search_videos(self, query: str, limit: int = 50) -> List[Dict[str, Any]]:
         """
-        Search strategy that prioritizes topic relevance:
-        1. First search the FULL combined phrase (most relevant)
-        2. Then search each keyword WITH context of other keywords (supplementary)
+        Search YouTube for the FULL combined phrase.
+        Tags all results with a single combined hashtag so the content service
+        only returns videos from this exact search — no cross-contamination.
         
-        e.g., "Amazon DSA" →
-          Search 1: "Amazon DSA #shorts" (full phrase, most relevant)
-          Search 2: "Amazon DSA interview coding #shorts" (enriched query)
-        
-        This avoids the problem of searching "Amazon" alone which returns
-        random shopping/delivery videos unrelated to DSA.
+        'Amazon DSA' → searches YouTube for "Amazon DSA #shorts"
+                     → tags every result with '#amazon-dsa'
         """
-        keywords = [w.strip() for w in query.split() if w.strip()]
-        full_query = " ".join(keywords)
-        all_hashtags = [f"#{kw}" for kw in keywords]
+        tag = normalize_hashtag(query)
+        search_query = f"{query} #shorts"
+        print(f"YouTube search: '{search_query}' → tag: {tag}")
 
         all_results = []
-        seen_video_ids: Set[str] = set()
+        seen_ids: Set[str] = set()
+        self._do_search(search_query, limit, [tag], all_results, seen_ids)
 
-        # --- Phase 1: Search the FULL combined phrase (highest relevance) ---
-        search_query = f"{full_query} #shorts"
-        print(f"Phase 1 - Full phrase search: '{search_query}'")
-        self._do_search(search_query, limit, all_hashtags, all_results, seen_video_ids)
-
-        # --- Phase 2: Contextual keyword searches (each word keeps context of others) ---
-        if len(keywords) > 1:
-            for kw in keywords:
-                # Search each keyword but WITH the other keywords as context
-                # e.g., for "Amazon DSA": search "Amazon DSA coding #shorts" and "DSA Amazon interview #shorts"
-                other_keywords = [w for w in keywords if w != kw]
-                contextual_query = f"{kw} {' '.join(other_keywords)} #shorts"
-                remaining = max(10, (limit - len(all_results)) // len(keywords))
-                print(f"Phase 2 - Contextual search: '{contextual_query}' (limit {remaining})")
-                self._do_search(contextual_query, remaining, all_hashtags, all_results, seen_video_ids)
-
-        print(f"Total unique videos found: {len(all_results)}")
+        print(f"Found {len(all_results)} videos for '{query}'")
         return all_results
 
     def _do_search(self, search_query: str, limit: int, hashtags: List[str],
@@ -74,19 +66,16 @@ class YouTubeClient:
 
     def get_related_keywords(self, query: str, max_results: int = 5) -> List[str]:
         """
-        Generate TOPIC-COHERENT related phrases using Datamuse API.
-        Instead of finding random associations for individual words,
-        this finds words related to the COMBINED topic and keeps
-        the original context in each suggestion.
+        Generate topic-coherent related phrases using Datamuse API.
+        Every returned phrase keeps the original query as context.
         
-        e.g., "Amazon DSA" → ["Amazon DSA interview", "Amazon coding round",
-               "DSA problems", "Amazon SDE preparation", "coding interview"]
+        'Amazon DSA' → ['Amazon DSA interview', 'Amazon DSA coding', ...]
         """
         keywords = [w.strip().lower() for w in query.split() if w.strip()]
         full_query = " ".join(keywords)
         related_phrases: List[str] = []
 
-        # Strategy 1: Find words triggered by the FULL query (topic-coherent)
+        # Find words triggered by the full query
         try:
             resp = http_requests.get(DATAMUSE_API, params={
                 "rel_trg": full_query, "max": 10
@@ -95,12 +84,11 @@ class YouTubeClient:
                 for item in resp.json():
                     word = item.get("word", "").strip()
                     if word and word.lower() not in keywords:
-                        # Combine with original query for compound phrase
                         related_phrases.append(f"{full_query} {word}")
         except Exception as e:
-            print(f"Datamuse full-query lookup failed: {e}")
+            print(f"Datamuse lookup failed: {e}")
 
-        # Strategy 2: For each keyword, find triggered words and combine with full context
+        # Per-keyword associations combined with full context
         for kw in keywords:
             try:
                 resp = http_requests.get(DATAMUSE_API, params={
@@ -110,14 +98,13 @@ class YouTubeClient:
                     for item in resp.json():
                         word = item.get("word", "").strip()
                         if word and word.lower() not in keywords and " " not in word:
-                            # Keep the original context + new word
                             phrase = f"{full_query} {word}"
                             if phrase not in related_phrases:
                                 related_phrases.append(phrase)
             except Exception as e:
-                print(f"Datamuse per-keyword lookup failed for '{kw}': {e}")
+                print(f"Datamuse per-keyword failed for '{kw}': {e}")
 
-        # Strategy 3: If Datamuse returned nothing, generate contextual expansions
+        # Fallback
         if not related_phrases:
             related_phrases = [
                 f"{full_query} tutorial",
@@ -127,33 +114,37 @@ class YouTubeClient:
                 f"best {full_query}",
             ]
 
-        # Deduplicate and limit
+        # Deduplicate
         seen = set()
-        unique_phrases = []
+        unique = []
         for p in related_phrases:
             if p.lower() not in seen:
                 seen.add(p.lower())
-                unique_phrases.append(p)
+                unique.append(p)
 
-        result = unique_phrases[:max_results]
+        result = unique[:max_results]
         print(f"Related phrases for '{query}': {result}")
         return result
 
     def search_related_videos(self, query: str, limit_per_topic: int = 10) -> List[Dict[str, Any]]:
         """
-        Find related videos using Datamuse-generated compound phrases.
-        Each phrase maintains the original topic context.
+        Fetch related videos. Each related phrase gets its own combined tag
+        so it doesn't pollute the primary feed.
         """
         related_phrases = self.get_related_keywords(query)
-        all_hashtags = [f"#{w}" for w in query.split() if w.strip()]
+        primary_tag = normalize_hashtag(query)
 
         all_results = []
-        seen_video_ids: Set[str] = set()
+        seen_ids: Set[str] = set()
 
         for phrase in related_phrases:
+            phrase_tag = normalize_hashtag(phrase)
             search_query = f"{phrase} #shorts"
-            print(f"Searching related: '{search_query}'")
-            self._do_search(search_query, limit_per_topic, all_hashtags, all_results, seen_video_ids)
+            print(f"Searching related: '{search_query}' → tag: {phrase_tag}")
+            # Tag with BOTH the primary tag (so they show in the primary feed)
+            # and the phrase-specific tag
+            self._do_search(search_query, limit_per_topic,
+                            [primary_tag, phrase_tag], all_results, seen_ids)
 
         print(f"Total related videos found: {len(all_results)}")
         return all_results
@@ -165,6 +156,7 @@ class YouTubeClient:
             print(f"Channel not found: {channel_name}")
             return []
 
+        tag = f"@{channel_name.replace('@', '').strip().lower()}"
         try:
             request = self.youtube.search().list(
                 part="snippet",
@@ -178,7 +170,7 @@ class YouTubeClient:
 
             results = []
             for item in response.get('items', []):
-                video_data = self._map_video_data(item, [f"@{channel_name}"])
+                video_data = self._map_video_data(item, [tag])
                 if video_data:
                     results.append(video_data)
             return results
@@ -211,8 +203,8 @@ class YouTubeClient:
             video_id = item['id']['videoId']
             thumbnails = snippet.get('thumbnails', {})
             thumbnail_url = (
-                thumbnails.get('high', {}).get('url') or 
-                thumbnails.get('medium', {}).get('url') or 
+                thumbnails.get('high', {}).get('url') or
+                thumbnails.get('medium', {}).get('url') or
                 thumbnails.get('default', {}).get('url')
             )
             return {
@@ -220,7 +212,7 @@ class YouTubeClient:
                 'title': snippet['title'],
                 'url': f"https://www.youtube.com/shorts/{video_id}",
                 'thumbnailUrl': thumbnail_url,
-                'duration': 60, 
+                'duration': 60,
                 'viewCount': 0,
                 'uploadDate': snippet['publishedAt'],
                 'channelTitle': snippet['channelTitle'],

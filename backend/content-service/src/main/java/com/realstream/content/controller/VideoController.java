@@ -44,14 +44,10 @@ public class VideoController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         if (hashtag != null && !hashtag.isBlank()) {
-            // Split multi-word queries like "DSA Amazon" into individual hashtags
-            String[] words = hashtag.trim().split("\\s+");
-            List<String> normalizedTags = new java.util.ArrayList<>();
-            for (String word : words) {
-                String tag = word.startsWith("#") ? word : "#" + word;
-                normalizedTags.add(tag);
-            }
-            Page<Video> videos = videoRepository.findByHashtagsIn(normalizedTags, pageable);
+            // Normalize to combined hashtag format: "Amazon DSA" → "#amazon-dsa"
+            // This matches exactly what the scraper stores
+            String normalized = "#" + hashtag.trim().toLowerCase().replaceAll("\\s+", "-");
+            Page<Video> videos = videoRepository.findByHashtagsIn(List.of(normalized), pageable);
             return ResponseEntity.ok(videos);
         }
 
