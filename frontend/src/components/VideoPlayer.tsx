@@ -35,18 +35,18 @@ export default function VideoOverlay({
                 </button>
             )}
 
-            {/* Play/Pause Toggle Button */}
+            {/* Play/Pause Full Screen Overlay */}
             {isActive && (
-                <button
+                <div
+                    className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center"
                     onClick={onTogglePlay}
-                    className="absolute top-[140px] right-4 z-30 p-3 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white shadow-lg active:scale-90 transition-transform flex items-center justify-center pointer-events-auto"
                 >
-                    {isPlaying ? (
-                        <Pause className="w-6 h-6" />
-                    ) : (
-                        <Play className="w-6 h-6 pl-1" />
+                    {!isPlaying && (
+                        <div className="p-5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white shadow-2xl transition-all scale-100 animate-in fade-in zoom-in duration-200">
+                            <Play className="w-12 h-12 pl-1.5 opacity-90" />
+                        </div>
                     )}
-                </button>
+                </div>
             )}
 
             {/* Unmute prompt */}
