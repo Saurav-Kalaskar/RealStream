@@ -4,7 +4,7 @@ import { Volume2, VolumeX, Play, Pause } from "lucide-react";
 
 interface VideoOverlayProps {
     isActive: boolean;
-    isPlaying: boolean;
+    isPaused: boolean;
     isMuted: boolean;
     onToggleMute: (e: React.MouseEvent) => void;
     onTogglePlay: (e: React.MouseEvent) => void;
@@ -12,7 +12,7 @@ interface VideoOverlayProps {
 
 export default function VideoOverlay({
     isActive,
-    isPlaying,
+    isPaused,
     isMuted,
     onToggleMute,
     onTogglePlay
@@ -41,7 +41,7 @@ export default function VideoOverlay({
                     className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center"
                     onClick={onTogglePlay}
                 >
-                    {!isPlaying && (
+                    {isPaused && (
                         <div className="p-5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white shadow-2xl transition-all scale-100 animate-in fade-in zoom-in duration-200">
                             <Play className="w-12 h-12 pl-1.5 opacity-90" />
                         </div>
@@ -50,7 +50,7 @@ export default function VideoOverlay({
             )}
 
             {/* Unmute prompt */}
-            {isActive && isMuted && isPlaying && (
+            {isActive && isMuted && !isPaused && (
                 <div className="absolute top-[88px] right-[70px] z-20 pointer-events-none animate-pulse">
                     <span className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-white text-xs font-bold shadow-lg flex items-center whitespace-nowrap">
                         Tap to unmute

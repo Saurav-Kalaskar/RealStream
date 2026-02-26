@@ -34,7 +34,7 @@ function HomeContent() {
 
   // Global Player State
   const [isGlobalMuted, setIsGlobalMuted] = useState(true);
-  const [isGlobalPlaying, setIsGlobalPlaying] = useState(false);
+  const [isUserPaused, setIsUserPaused] = useState(false);
 
   // Browser history: handle back button
   useEffect(() => {
@@ -174,6 +174,7 @@ function HomeContent() {
     const index = Math.round(container.scrollTop / container.clientHeight);
     if (index !== activeIndex) {
       setActiveIndex(index);
+      setIsUserPaused(false); // Auto-play when swiping to a new video
     }
   };
 
@@ -299,8 +300,8 @@ function HomeContent() {
             <FeedPlayer
               videoId={filteredVideos[activeIndex]?.videoId || null}
               isMuted={isGlobalMuted}
-              isPlaying={isGlobalPlaying}
-              onPlayingChange={setIsGlobalPlaying}
+              isPlaying={!isUserPaused}
+              onPlayingChange={() => { }}
             />
           </div>
           {/* Scrollable Content Area */}
@@ -321,7 +322,7 @@ function HomeContent() {
               <div key={`${video.id}-${index}`} className="w-full h-full snap-start relative bg-transparent">
                 <VideoPlayer
                   isActive={index === activeIndex}
-                  isPlaying={index === activeIndex ? isGlobalPlaying : false}
+                  isPaused={index === activeIndex ? isUserPaused : false}
                   isMuted={isGlobalMuted}
                   onToggleMute={(e) => {
                     e.stopPropagation();
@@ -329,7 +330,7 @@ function HomeContent() {
                   }}
                   onTogglePlay={(e) => {
                     e.stopPropagation();
-                    setIsGlobalPlaying(!isGlobalPlaying);
+                    setIsUserPaused(!isUserPaused);
                   }}
                 />
 
