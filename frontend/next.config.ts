@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/interactions/:path*",
-        destination: "http://interaction-service:8085/interactions/:path*",
+        destination: "http://interaction-service:8085/api/interactions/:path*",
       },
       {
         source: "/api/scraper/:path*",

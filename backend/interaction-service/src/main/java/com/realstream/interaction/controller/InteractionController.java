@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-//@RequestMapping("/interactions")
+@RequestMapping("/api/interactions")
 @RequiredArgsConstructor
 public class InteractionController {
 
@@ -22,11 +22,15 @@ public class InteractionController {
             @RequestHeader("X-User-Id") UUID userId,
             @PathVariable String videoId) {
         
+        System.out.println(">>> TOGGLE LIKE RECEIVED - User: " + userId + ", Video: " + videoId);
+        
         boolean exists = likeRepository.existsByUserIdAndVideoId(userId, videoId);
         
         if (exists) {
+            System.out.println(">>> Like exists, deleting...");
             likeRepository.deleteByUserIdAndVideoId(userId, videoId);
         } else {
+            System.out.println(">>> Like does not exist, creating...");
             likeRepository.save(Like.builder()
                     .userId(userId)
                     .videoId(videoId)
@@ -43,6 +47,8 @@ public class InteractionController {
     public ResponseEntity<LikeStatus> getLikeStatus(
             @RequestHeader(value = "X-User-Id", required = false) UUID userId,
             @PathVariable String videoId) {
+        
+        System.out.println(">>> GET LIKE STATUS - User: " + userId + ", Video: " + videoId);
         
         boolean isLiked = userId != null && likeRepository.existsByUserIdAndVideoId(userId, videoId);
         
