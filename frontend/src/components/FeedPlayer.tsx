@@ -42,10 +42,11 @@ const loadYouTubeAPI = () => {
 interface FeedPlayerProps {
     videoId: string | null;
     isMuted: boolean;
+    isPlaying: boolean;
     onPlayingChange: (isPlaying: boolean) => void;
 }
 
-export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPlayerProps) {
+export default function FeedPlayer({ videoId, isMuted, isPlaying, onPlayingChange }: FeedPlayerProps) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const playerRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -163,6 +164,20 @@ export default function FeedPlayer({ videoId, isMuted, onPlayingChange }: FeedPl
             }
         } catch { /* ignore */ }
     }, [isMuted, isPlayerReady]);
+
+    // 4. Handle Play/Pause State securely
+    useEffect(() => {
+        if (!isPlayerReady || !playerRef.current) return;
+
+        try {
+            const playerState = playerRef.current.getPlayerState();
+            if (isPlaying && playerState !== 1) { // 1 is playing
+                playerRef.current.playVideo();
+            } else if (!isPlaying && playerState === 1) {
+                playerRef.current.pauseVideo();
+            }
+        } catch { /* ignore */ }
+    }, [isPlaying, isPlayerReady]);
 
 
     return (

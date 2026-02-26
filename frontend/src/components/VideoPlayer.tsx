@@ -1,19 +1,21 @@
 "use client";
 
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Play, Pause } from "lucide-react";
 
 interface VideoOverlayProps {
     isActive: boolean;
     isPlaying: boolean;
     isMuted: boolean;
     onToggleMute: (e: React.MouseEvent) => void;
+    onTogglePlay: (e: React.MouseEvent) => void;
 }
 
 export default function VideoOverlay({
     isActive,
     isPlaying,
     isMuted,
-    onToggleMute
+    onToggleMute,
+    onTogglePlay
 }: VideoOverlayProps) {
 
     return (
@@ -29,6 +31,20 @@ export default function VideoOverlay({
                         <VolumeX className="w-6 h-6" />
                     ) : (
                         <Volume2 className="w-6 h-6" />
+                    )}
+                </button>
+            )}
+
+            {/* Play/Pause Toggle Button */}
+            {isActive && (
+                <button
+                    onClick={onTogglePlay}
+                    className="absolute top-[140px] right-4 z-30 p-3 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white shadow-lg active:scale-90 transition-transform flex items-center justify-center pointer-events-auto"
+                >
+                    {isPlaying ? (
+                        <Pause className="w-6 h-6" />
+                    ) : (
+                        <Play className="w-6 h-6 pl-1" />
                     )}
                 </button>
             )}

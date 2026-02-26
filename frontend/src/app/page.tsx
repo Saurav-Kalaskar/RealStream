@@ -299,6 +299,7 @@ function HomeContent() {
             <FeedPlayer
               videoId={filteredVideos[activeIndex]?.videoId || null}
               isMuted={isGlobalMuted}
+              isPlaying={isGlobalPlaying}
               onPlayingChange={setIsGlobalPlaying}
             />
           </div>
@@ -325,6 +326,10 @@ function HomeContent() {
                   onToggleMute={(e) => {
                     e.stopPropagation();
                     setIsGlobalMuted(!isGlobalMuted);
+                  }}
+                  onTogglePlay={(e) => {
+                    e.stopPropagation();
+                    setIsGlobalPlaying(!isGlobalPlaying);
                   }}
                 />
 
