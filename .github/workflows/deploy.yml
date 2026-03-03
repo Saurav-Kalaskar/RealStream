@@ -14,10 +14,33 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          command_timeout: 10m
           script: |
+            set -e
             cd /root/RealStream
             git pull origin main
-            docker compose -f docker-compose.prod.yml up -d --build
-            sleep 5
-            docker compose -f docker-compose.prod.yml restart nginx
-            echo "Deployed at $(date)"
+
+            # Rebuild backend services first (not nginx)
+            docker compose -f docker-compose.prod.yml up -d --build \
+              postgres mongo \
+              auth-service user-service content-service comment-service interaction-service \
+              scraper-service frontend
+
+            # Wait for content-service health check (critical for scraper)
+            echo "Waiting for services to be healthy..."
+            for i in $(seq 1 30); do
+              if docker compose -f docker-compose.prod.yml ps content-service | grep -q healthy; then
+                echo "content-service healthy after ${i}s"
+                break
+              fi
+              sleep 2
+            done
+
+            # Now restart nginx to pick up new container IPs
+            docker compose -f docker-compose.prod.yml up -d --build nginx
+            sleep 2
+
+            # Verify
+            HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost || echo "000")
+            echo "Deployed at $(date) - HTTP status: $HTTP_CODE"
