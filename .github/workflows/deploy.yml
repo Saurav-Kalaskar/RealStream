@@ -37,8 +37,10 @@ jobs:
               sleep 2
             done
 
-            # Now restart nginx to pick up new container IPs
-            docker compose -f docker-compose.prod.yml up -d --build nginx
+            # Reload nginx config (bind-mounted, so just reload — no rebuild needed)
+            # Dynamic DNS resolver in nginx.conf prevents stale IP issues
+            docker exec realstream-nginx-1 nginx -t && \
+              docker exec realstream-nginx-1 nginx -s reload
             sleep 2
 
             # Verify
