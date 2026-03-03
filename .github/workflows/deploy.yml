@@ -37,11 +37,10 @@ jobs:
               sleep 2
             done
 
-            # Reload nginx config (bind-mounted, so just reload — no rebuild needed)
-            # Dynamic DNS resolver in nginx.conf prevents stale IP issues
-            docker exec realstream-nginx-1 nginx -t && \
-              docker exec realstream-nginx-1 nginx -s reload
-            sleep 2
+            # Force-recreate nginx so it picks up updated bind-mounted config
+            # (git pull creates new file inode; existing container keeps old inode)
+            docker compose -f docker-compose.prod.yml up -d --force-recreate nginx
+            sleep 3
 
             # Verify
             HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost || echo "000")
