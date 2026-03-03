@@ -22,6 +22,11 @@ services:
       MONGO_INITDB_DATABASE: realstream_content
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- Backend Services ---
   auth-service:
@@ -62,7 +67,14 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/realstream_content
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/localhost/8083' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   comment-service:
     build:
@@ -97,7 +109,8 @@ services:
       # Add any env vars needed for scraper, e.g. YouTube API Key
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
     depends_on:
-      - content-service
+      content-service:
+        condition: service_healthy
 
   # --- Frontend ---
   frontend:
