@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Play } from "lucide-react";
+import { User, Play, Loader2 } from "lucide-react";
 
 interface OnboardingUser {
     name: string;
@@ -100,13 +100,17 @@ export default function Onboarding({ onStart, isLoading, onLogin, onLogout, user
                             <button
                                 onClick={handleSubmit}
                                 disabled={isLoading}
-                                className="relative w-[68px] h-[68px] rounded-full backdrop-blur-3xl border border-white/20 bg-white/10 flex items-center justify-center shadow-2xl transition-transform duration-500 active:scale-95 group-hover:border-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`relative w-[68px] h-[68px] rounded-full backdrop-blur-3xl border border-white/20 bg-white/10 flex items-center justify-center shadow-2xl transition-transform duration-500 active:scale-95 group-hover:border-primary/40 disabled:cursor-not-allowed ${isLoading ? 'scale-95' : ''}`}
                             >
                                 {/* Outer Glass Ring Decoration */}
                                 <div className="absolute inset-1 rounded-full border border-white/5 pointer-events-none"></div>
-                                {/* Center Play Icon */}
+                                {/* Center Play/Loader Icon */}
                                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 ml-1 shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform duration-500 group-hover:scale-110">
-                                    <Play className="fill-white text-white w-5 h-5" />
+                                    {isLoading ? (
+                                        <Loader2 className="text-primary w-6 h-6 animate-spin -ml-1" />
+                                    ) : (
+                                        <Play className="fill-white text-white w-5 h-5" />
+                                    )}
                                 </div>
                                 {/* Subtle Inner Glow */}
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
