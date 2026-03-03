@@ -36,3 +36,7 @@ logging:
   level:
     org.springframework.security: DEBUG
     com.realstream.auth: DEBUG
+
+app:
+  auth:
+    token-secret: ${APP_AUTH_TOKEN_SECRET:default-dev-secret-change-me-in-production}

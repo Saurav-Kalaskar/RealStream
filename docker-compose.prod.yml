@@ -38,6 +38,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       APP_OAUTH2_FRONTEND_URL: ${FRONTEND_URL}
+      APP_AUTH_TOKEN_SECRET: ${APP_AUTH_TOKEN_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,6 +122,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - ./certbot/certs:/etc/ssl:ro
     depends_on:
       - frontend
       - auth-service

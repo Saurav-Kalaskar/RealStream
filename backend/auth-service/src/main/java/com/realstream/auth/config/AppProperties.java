@@ -18,8 +18,8 @@ public class AppProperties {
     @Getter
     @Setter
     public static class Auth {
-        // 32-byte (256-bit) secret encoded in Base64
-        private String tokenSecret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+        // Override in production via APP_AUTH_TOKEN_SECRET env var
+        private String tokenSecret = "default-dev-secret-change-me-in-production";
         private long tokenExpirationMsec = 86400000;
     }
 

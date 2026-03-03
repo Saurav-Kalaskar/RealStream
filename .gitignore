@@ -1,6 +1,7 @@
 # Environment Variables
 .env
 .env.*
+!.env.production.example
 
 # Java / Maven
 target/
@@ -40,6 +41,9 @@ yarn-error.log*
 # Cloudflare
 tunnel.log
 .cloudflared/
+
+# SSL certs
+certbot/
 
 *.pdf
 SSh-KEY/
