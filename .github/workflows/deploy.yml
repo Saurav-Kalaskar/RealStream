@@ -18,4 +18,6 @@ jobs:
             cd /root/RealStream
             git pull origin main
             docker compose -f docker-compose.prod.yml up -d --build
+            sleep 5
+            docker compose -f docker-compose.prod.yml restart nginx
             echo "Deployed at $(date)"
