@@ -334,7 +334,7 @@ function HomeContent() {
                   }}
                 />
 
-                <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-end pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8">
+                <div className="absolute inset-0 pointer-events-none z-20 p-4 flex flex-col justify-end pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8">
                   <div className="flex flex-row items-end justify-between w-full pointer-events-auto">
                     <VideoMetadata
                       username={video.channelTitle || "@creator"}
